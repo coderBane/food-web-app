@@ -1,6 +1,15 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Foody.Data.Data;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var Configurations = builder.Configuration;
+
+// DbContext DI
+builder.Services.AddDbContext<FoodyDbContext>(option =>
+    option.UseSqlite(Configurations.GetConnectionString("Default")));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
