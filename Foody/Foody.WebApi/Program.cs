@@ -1,4 +1,5 @@
 ﻿using Foody.Data.Data;
+using Foody.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var Configurations = builder.Configuration;
 
-// DbContext DI
+//Add DbContext DI
 builder.Services.AddDbContext<FoodyDbContext>(option =>
     option.UseSqlite(Configurations.GetConnectionString("Default")));
 
@@ -21,15 +22,17 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-

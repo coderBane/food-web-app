@@ -12,7 +12,6 @@ namespace Foody.Data.Data
             builder => { builder.AddConsole(); });
 
         public DbSet<Item> Items => Set<Item>();
-        public DbSet<AppUser> AppUsers => Set<AppUser>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Category> Categories => Set<Category>();
 

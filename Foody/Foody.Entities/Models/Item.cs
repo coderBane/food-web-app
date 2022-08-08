@@ -10,7 +10,7 @@ public abstract class Item : BaseEntity
     public  bool IsActive { get; set; }
 
     [ScaffoldColumn(false)]
-    public string ImageUri { get; set; } = "";
+    public string ImageUri { get; set; } = "images/noImg.jpeg";
 
     [NotMapped]
     public byte[] ImageData { get; set; } = Array.Empty<byte>();
