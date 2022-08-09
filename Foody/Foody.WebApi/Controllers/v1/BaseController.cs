@@ -11,7 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Foody.WebApi.Controllers.v1
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("/v{version:apiVersion}/[controller]")]
     public class BaseController : Controller
     {
         protected IUnitofWork _unitofWork;
