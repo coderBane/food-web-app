@@ -21,6 +21,7 @@
     <None Remove="Microsoft.EntityFrameworkCore.Design" />
     <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <None Remove="Microsoft.AspNetCore.Identity.UI" />
+    <None Remove="Controllers\v1\" />
     <None Remove="Microsoft.AspNetCore.Mvc.Versioning" />
   </ItemGroup>
   <ItemGroup>
@@ -38,5 +39,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\images\" />
+    <Folder Include="Controllers\v1\" />
   </ItemGroup>
 </Project>
