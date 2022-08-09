@@ -22,6 +22,6 @@ public class AppUser : BaseEntity
 
     public int? AddressId { get; set; }
 
-    public Address Address { get; set; }
+    public Address Address { get; set; } = null!;
 }
 
