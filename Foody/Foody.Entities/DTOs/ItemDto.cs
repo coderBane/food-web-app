@@ -1,6 +1,4 @@
-﻿using System;
-
-#nullable disable
+﻿#nullable disable
 
 namespace Foody.Entities.DTOs;
 
@@ -11,17 +9,13 @@ public class ItemDto
     public bool IsActive { get; set; }
 }
 
-public class ItemDetailDto
+public class ItemDetailDto : ItemDto
 {
-   
-    public string Name { get; set; }
+    public string  ImageUri { get; set; }
 
-    public bool IsActive { get; set; }
-
-    public string ImageUri { get; set; }
+    public byte[] ImageData { get; set; }
 
     public DateTime AddedOn { get; set; }
 
     public DateTime Updated { get; set; }
 }
-
