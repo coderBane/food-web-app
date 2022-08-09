@@ -21,12 +21,19 @@ public class CategoryRepository : Repository<Category>, ICategoryRepository
 
     public bool Exists(int id)
     {
-        return (_context.Categories?.Any(c => c.Id == id)).GetValueOrDefault();
+        return (_dbSet?.Any(c => c.Id == id)).GetValueOrDefault();
     }
 
-    public Task Update(Category category)
+    public async Task Update(Category category)
     {
-        throw new NotImplementedException();
+        var existing = await Get(category.Id);
+        if (existing is not null)
+        {
+            existing.Name = category.Name;
+            existing.IsActive = category.IsActive;
+            existing.ImageUri = category.ImageUri;
+            existing.ImageData = category.ImageData;
+            existing.Updated = DateTime.UtcNow;
+        }
     }
 }
-

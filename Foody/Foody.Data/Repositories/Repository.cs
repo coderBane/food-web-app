@@ -1,5 +1,4 @@
 ﻿using System;
-using AutoMapper;
 using Foody.Data.Data;
 using Foody.Data.Interfaces;
 using System.Linq.Expressions;
@@ -28,9 +27,13 @@ public class Repository<T> : IRepository<T> where T : class
        return await _dbSet.ToListAsync();
     }
 
-    public virtual Task Delete(int id)
+    public virtual async Task Delete(int id)
     {
-        throw new NotImplementedException();
+        var entity = await Get(id);
+        if (entity is not null)
+            _dbSet.Remove(entity);
+        else
+            throw new NullReferenceException(nameof(entity) + " Was not found");
     }
 
     public virtual IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
