@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//Add services to the container.
 
 var Configurations = builder.Configuration;
 
@@ -12,12 +12,26 @@ var Configurations = builder.Configuration;
 builder.Services.AddDbContext<FoodyDbContext>(option =>
     option.UseSqlite(Configurations.GetConnectionString("Default")));
 
+//Add UnitofWork DI
+builder.Services.AddScoped<IUnitofWork, UnitofWork>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 var app = builder.Build();
+
+/*** Initialize Database ***/
+using(var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    using var content = services.GetRequiredService<FoodyDbContext>();
+    DbInitialize.Initialize(content);
+}
+ /*****/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
