@@ -1,5 +1,4 @@
 ﻿using System;
-using AutoMapper;
 using Foody.Data.Interfaces;
 using Foody.Data.Repositories;
 using System.Diagnostics.CodeAnalysis;
