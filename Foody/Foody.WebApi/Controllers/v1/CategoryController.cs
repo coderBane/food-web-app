@@ -1,95 +1,98 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using Foody.Entities.DTOs;
 using Foody.Entities.Models;
 using Foody.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Foody.WebApi.Controllers.v1
 {
     public class CategoryController : BaseController
     {
-        public CategoryController(IUnitofWork unitofWork) : base(unitofWork)
+        public CategoryController(IUnitofWork unitofWork, IMapper mapper) : base(unitofWork, mapper)
         {
         }
 
-        // GET: Categories
+        // GET: v/Categories
         [HttpGet]
         [HttpHead]
+        [ProducesResponseType(200, Type = typeof(CategoryDto))]
         public async Task<IActionResult> Get()
         { 
             var result = await _unitofWork.Categories.All();
-            var dto = from c in result
-                      select new CategoryDto()
-                      {
-                          Name = c.Name,
-                          IsActive = c.IsActive
-                      };
+            var _dto = from c in result
+                      select _mapper.Map<CategoryDto>(c);
 
-            return _unitofWork.Categories is not null ? Ok(dto) :
+            return _unitofWork.Categories is not null ? Ok(_dto) :
                 Problem("Entity set 'FoodyDbContext' is null");
         }
 
-        // GET: api/Category/5
+        // GET: v/Category/5
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(CategoryDetailDto))]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _unitofWork.Categories.Get(id);
+            var _dto = _mapper.Map<CategoryDetailDto>(result);
 
-            return result is null ? NotFound() : Ok(new CategoryDetailDto
-            {
-                Name = result.Name,
-                IsActive = result.IsActive,
-                ImageUri = result.ImageUri,
-                ImageData = result.ImageData,
-                AddedOn = result.AddedOn,
-                Updated = result.Updated
-            });
+            return result is null ? NotFound() : Ok(_dto);
         }
 
-        // POST api/values
+        // POST: v/Category
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(CategoryDetailDto))]
-        public async Task<IActionResult> Post([FromForm] CategoryDto categoryDto, IFormFile? formFile)
+        public async Task<IActionResult> Post([FromForm] CategoryDto categoryDto)
         {
-            var category = new Category
-            {
-                Name = categoryDto.Name,
-                IsActive = categoryDto.IsActive,
-            };
+            var category = _mapper.Map<Category>(categoryDto);
+            Upload(ref category, categoryDto.ImageUpload);
 
-            Upload(ref category, formFile);
-            if (!TryValidateModel(category, nameof(category)))
+            ModelState.ClearValidationState(nameof(categoryDto));
+            if (!TryValidateModel(category))
             {
-                return BadRequest();
+                return UnprocessableEntity(ModelState);
             }
 
             _unitofWork.Categories.Add(category);
             await _unitofWork.CompleteAsync();
 
-            return CreatedAtAction(nameof(Get), new { id = category.Id},
-            new CategoryDetailDto
-            {
-                Name = category.Name,
-                IsActive = category.IsActive,
-                ImageUri = category.ImageUri,
-                ImageData = category.ImageData,
-                AddedOn = category.AddedOn,
-                Updated = category.Updated
-            });
+            var _dto = _mapper.Map<CategoryDetailDto>(category);
+
+            return CreatedAtAction(nameof(Get), new { id = category.Id}, _dto);
         }
 
-        // PUT api/values/5
+        // PUT: v/Category/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Put(int id, [FromForm] CategoryDto categoryDto)
         {
+            var category = await _unitofWork.Categories.Get(id);
+
+            if (category is null)
+                return NotFound();
+
+            _mapper.Map(categoryDto, category);
+            Upload(ref category, categoryDto.ImageUpload);
+
+            ModelState.ClearValidationState(nameof(categoryDto));
+            try
+            {
+                if (!TryValidateModel(category))
+                    return UnprocessableEntity(ModelState);
+
+                await _unitofWork.Categories.Update(category);
+                await _unitofWork.CompleteAsync();
+            }
+            catch (DbUpdateConcurrencyException) when (!_unitofWork.Categories.Exists(id))
+            {
+                return NotFound();
+            }
+
+            return NoContent();
         }
 
-        // DELETE api/values/5
+        // DELETE v/Category/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -109,15 +112,12 @@ namespace Foody.WebApi.Controllers.v1
             return NoContent();
         }
 
-        private void Upload(ref Category category, IFormFile? file)
+        private static void Upload(ref Category category, IFormFile? file)
         {
             if (file is not null)
             {
                 using var ms = new MemoryStream();
                 file.CopyTo(ms);
-
-                if (ms.Length > 3145728)
-                    ModelState.AddModelError("formFile", "Image should be 3MB or less");
 
                 category.ImageUri = Guid.NewGuid() + "-" + file.FileName;
                 category.ImageData = ms.ToArray();
@@ -128,4 +128,3 @@ namespace Foody.WebApi.Controllers.v1
         }
     }
 }
-

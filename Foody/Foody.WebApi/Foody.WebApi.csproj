@@ -8,13 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +24,8 @@
     <None Remove="Microsoft.AspNetCore.Identity.UI" />
     <None Remove="Controllers\v1\" />
     <None Remove="Microsoft.AspNetCore.Mvc.Versioning" />
+    <None Remove="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+    <None Remove="Profiles\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foody.Data\Foody.Data.csproj">
@@ -40,5 +43,6 @@
     <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="Controllers\v1\" />
+    <Folder Include="Profiles\" />
   </ItemGroup>
 </Project>
