@@ -26,7 +26,7 @@ public class CategoryRepository : Repository<Category>, ICategoryRepository
 
     public async Task Update(Category category)
     {
-        var existing = await Get(category.Id);
+        var existing = await _dbSet.Where(x => x.Id == category.Id).FirstOrDefaultAsync();
         if (existing is not null)
         {
             existing.Name = category.Name;

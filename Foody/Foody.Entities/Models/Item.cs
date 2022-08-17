@@ -13,6 +13,7 @@ public abstract class Item : BaseEntity
     public string ImageUri { get; set; } = "images/noImg.jpeg";
 
     [NotMapped]
+    [MaxLength(3145728, ErrorMessage = "Max upload size is 3MB.")]
     public byte[] ImageData { get; set; } = Array.Empty<byte>();
 }
 
