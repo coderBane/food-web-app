@@ -14,6 +14,7 @@
     <None Remove="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
     <None Remove="Interfaces\" />
     <None Remove="Repositories\" />
+    <None Remove="Faker.Net" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.8">
@@ -27,6 +28,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.8" />
+    <PackageReference Include="Faker.Net" Version="2.0.154" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foody.Entities\Foody.Entities.csproj" />

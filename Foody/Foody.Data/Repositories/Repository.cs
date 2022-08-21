@@ -42,7 +42,7 @@ public class Repository<T> : IRepository<T> where T : class
         return  _dbSet.Where(predicate);
     }
 
-    public async Task<T?> Get(int id)
+    public virtual async Task<T?> Get(int id)
     {
         return await _dbSet.FindAsync(id);
     }

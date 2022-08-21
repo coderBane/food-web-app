@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Foody.Data.Interfaces;
+using Foody.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -24,6 +21,21 @@ namespace Foody.WebApi.Controllers.v1
         {
             _unitofWork = unitofWork;
             _mapper = mapper;
+        }
+
+        [NonAction]
+        public static async Task Upload<T>(T entity, IFormFile file) where T : Item
+        {
+            if (file is null) return;
+
+            using var ms = new MemoryStream();
+            await file.CopyToAsync(ms);
+
+            entity.ImageUri = Guid.NewGuid() + "-" + file.FileName;
+            entity.ImageData = ms.ToArray();
+
+            ms.Close();
+            ms.Dispose();
         }
     }
 }

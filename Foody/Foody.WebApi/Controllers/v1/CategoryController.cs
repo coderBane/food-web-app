@@ -44,7 +44,7 @@ namespace Foody.WebApi.Controllers.v1
         public async Task<IActionResult> Post([FromForm] CategoryDto categoryDto)
         {
             var category = _mapper.Map<Category>(categoryDto);
-            Upload(ref category, categoryDto.ImageUpload);
+            await Upload(category, categoryDto.ImageUpload);
 
             ModelState.ClearValidationState(nameof(categoryDto));
             if (!TryValidateModel(category))
@@ -71,7 +71,7 @@ namespace Foody.WebApi.Controllers.v1
                 return NotFound();
 
             _mapper.Map(categoryDto, category);
-            Upload(ref category, categoryDto.ImageUpload);
+            await Upload(category, categoryDto.ImageUpload);
 
             ModelState.ClearValidationState(nameof(categoryDto));
             try
@@ -110,21 +110,6 @@ namespace Foody.WebApi.Controllers.v1
             }
 
             return NoContent();
-        }
-
-        private static void Upload(ref Category category, IFormFile? file)
-        {
-            if (file is not null)
-            {
-                using var ms = new MemoryStream();
-                file.CopyTo(ms);
-
-                category.ImageUri = Guid.NewGuid() + "-" + file.FileName;
-                category.ImageData = ms.ToArray();
-
-                ms.Close();
-                ms.Dispose();
-            }
         }
     }
 }
