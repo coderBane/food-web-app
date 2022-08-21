@@ -29,6 +29,45 @@ public class ItemDetailDto : ItemDto
     public DateTime Updated { get; set; }
 }
 
+
 public class CategoryDto : ItemDto { }
 
 public class CategoryDetailDto : ItemDetailDto { }
+
+
+public class ProductDto : ItemDto
+{
+    public string Category { get; set; }
+
+    public int Quantity { get; set; }
+
+    public decimal Price { get; set; }
+
+    public string Description { get; set; }
+}
+
+public class ProductDetailDto : ProductDto
+{
+    public string ImageUri { get; set; }
+
+    public byte[] ImageData { get; set; }
+
+    public DateTime AddedOn { get; set; }
+
+    public DateTime Updated { get; set; }
+}
+
+public class ProductModDto : ItemDto
+{
+    [Required]
+    public int Category { get; set; }
+
+    [DefaultValue(0)]
+    public int Quantity { get; set; }
+
+    [Required]
+    public decimal Price { get; set; }
+
+    [DataType(DataType.MultilineText)]
+    public string Description { get; set; }
+}
