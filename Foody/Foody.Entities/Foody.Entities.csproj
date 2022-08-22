@@ -8,8 +8,10 @@
 
   <ItemGroup>
     <None Remove="Microsoft.AspNetCore.Http" />
+    <None Remove="Microsoft.AspNetCore.Identity.UI" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
   </ItemGroup>
 </Project>
