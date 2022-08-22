@@ -1,7 +1,14 @@
-﻿using Foody.Data.Data;
+﻿using System.Text;
+
+using Foody.Data.Data;
 using Foody.Data.Interfaces;
+using Foody.Auth.Configuration;
+
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,9 +16,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 var Configurations = builder.Configuration;
 
+//Update JWT
+builder.Services.Configure<JwtConfig>(Configurations.GetSection("JwtConfig"));
+
 //Add DbContext DI
 builder.Services.AddDbContext<FoodyDbContext>(option =>
     option.UseSqlite(Configurations.GetConnectionString("Default")));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<FoodyDbContext>();
 
 //Add UnitofWork DI
 builder.Services.AddScoped<IUnitofWork, UnitofWork>();
@@ -26,7 +39,28 @@ builder.Services.AddApiVersioning(options =>
 {
     options.ReportApiVersions = true;
     options.AssumeDefaultVersionWhenUnspecified = true;
-    options.DefaultApiVersion = Microsoft.AspNetCore.Mvc.ApiVersion.Default;
+    options.DefaultApiVersion = ApiVersion.Default;
+});
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(jwt =>
+{
+    jwt.SaveToken = true;
+    jwt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false, // TODO Update to true
+        ValidateAudience = false, // TODO Update to true
+        ValidateLifetime = true,
+        RequireExpirationTime = false, // TODO Update to true
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.ASCII.GetBytes(Configurations["JwtConfig:Secret"])),
+        ClockSkew = TimeSpan.Zero,
+    };
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -41,7 +75,7 @@ using(var scope = app.Services.CreateScope())
     using var content = services.GetRequiredService<FoodyDbContext>();
     DbInitialize.Initialize(content);
 }
- /*****/
+/****************************/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -55,6 +89,7 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
