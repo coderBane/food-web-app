@@ -14,11 +14,14 @@ public class UnitofWork : IUnitofWork, IDisposable
         _context = context;
         Categories = new CategoryRepository(_context);
         Products = new ProductRepository(_context);
+        RefreshToken = new RefreshTokenRepository(_context);
     }
 
     public ICategoryRepository Categories { get; private set; }
 
     public IProductRepository Products { get; private set; }
+
+    public IRefreshTokenRepository RefreshToken { get; private set; }
 
     public async Task CompleteAsync()
     {

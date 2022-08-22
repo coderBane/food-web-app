@@ -14,6 +14,7 @@ namespace Foody.Data.Data
         public DbSet<Item> Items => Set<Item>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Category> Categories => Set<Category>();
+        public virtual DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         public FoodyDbContext(DbContextOptions<FoodyDbContext> options) : base(options) { }
 
