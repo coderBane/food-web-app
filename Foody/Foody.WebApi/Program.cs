@@ -14,14 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Add services to the container.
 
-var Configurations = builder.Configuration;
-
-//Update JWT
-builder.Services.Configure<JwtConfig>(Configurations.GetSection("JwtConfig"));
+//Update JWT class
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
 //Add DbContext DI
 builder.Services.AddDbContext<FoodyDbContext>(option =>
-    option.UseSqlite(Configurations.GetConnectionString("Default")));
+    option.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<FoodyDbContext>();
@@ -42,6 +40,21 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = ApiVersion.Default;
 });
 
+// Add TokenValidationParameters to DI
+var tokenValidationParams = new TokenValidationParameters
+{
+    ValidateIssuer = false, // TODO Update to true
+    ValidateAudience = false, // TODO Update to true
+    ValidateLifetime = true,
+    RequireExpirationTime = true,
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(
+        Encoding.ASCII.GetBytes(builder.Configuration["JwtConfig:Secret"])),
+};
+
+builder.Services.AddSingleton(tokenValidationParams);
+
+//  Add jwt authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,19 +63,10 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(jwt =>
 {
     jwt.SaveToken = true;
-    jwt.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false, // TODO Update to true
-        ValidateAudience = false, // TODO Update to true
-        ValidateLifetime = true,
-        RequireExpirationTime = false, // TODO Update to true
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.ASCII.GetBytes(Configurations["JwtConfig:Secret"])),
-        ClockSkew = TimeSpan.Zero,
-    };
+    jwt.TokenValidationParameters = tokenValidationParams;
 });
 
+// AutoMapper DI
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();

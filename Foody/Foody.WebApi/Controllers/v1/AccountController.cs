@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
+
 using Foody.Auth.DTOs;
 using Foody.Auth.Models;
+using Foody.Entities.Models;
 using Foody.Data.Interfaces;
 using Foody.Auth.Configuration;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using System.Text;
 using System.Security.Claims;
@@ -19,14 +21,18 @@ namespace Foody.WebApi.Controllers.v1
     public class AccountController : BaseController
     {
         private readonly JwtConfig _jwtConfig;
+
         private readonly UserManager<IdentityUser> _userManager;
 
+        private readonly TokenValidationParameters _tokenValidationParameters;
+
         public AccountController(IUnitofWork unitofWork, IMapper mapper, UserManager<IdentityUser> userManager,
-            IOptionsMonitor<JwtConfig> optionsMonitor)
+            IOptionsMonitor<JwtConfig> optionsMonitor, TokenValidationParameters tokenValidationParameters)
             : base(unitofWork, mapper)
         {
             _userManager = userManager;
             _jwtConfig = optionsMonitor.CurrentValue;
+            _tokenValidationParameters = tokenValidationParameters;
         }
 
         // v1/Account/Register
@@ -39,10 +45,11 @@ namespace Foody.WebApi.Controllers.v1
                 return BadRequest(new AuthResult()
                 { Success = false, Errors = new List<string> { "Passwords do not match!" } });
 
+            // check if email already exists
             var user = await _userManager.FindByEmailAsync(registrationDto.Email);
 
             if (user is not null)
-                return BadRequest(new AuthResult()
+                return Conflict(new AuthResult()
                 {
                     Success = false,
                     Errors = new List<string>
@@ -55,14 +62,15 @@ namespace Foody.WebApi.Controllers.v1
             string uName = string.IsNullOrEmpty(registrationDto.UserName) ?
                 registrationDto.Email.Split('@').ElementAt(0) : registrationDto.UserName;
 
-            var newUser = new IdentityUser()
+            // create user
+            var validUser = new IdentityUser()
             {
                 Email = registrationDto.Email,
                 UserName = uName,
                 EmailConfirmed = true, // TODO build confirmation functionality
             };
 
-            var created = await _userManager.CreateAsync(newUser, registrationDto.Password);
+            var created = await _userManager.CreateAsync(validUser, registrationDto.Password);
 
             if (!created.Succeeded) // if registrarion fails
                 return BadRequest(new AuthResult()
@@ -72,13 +80,9 @@ namespace Foody.WebApi.Controllers.v1
                 });
 
             // Generate jwt token
-            var token = JwtToken(newUser);
+            //var token = await JwtToken(validUser);
 
-            return Ok(new AuthResult()
-            {
-                Token = token,
-                Success = true,
-            });
+            return Ok(await JwtToken(validUser));
         }
 
         [HttpPost]
@@ -89,7 +93,7 @@ namespace Foody.WebApi.Controllers.v1
             var exists = await _userManager.FindByEmailAsync(logInDto.Email) ??
                 await _userManager.FindByNameAsync(logInDto.Email);
 
-            if (exists is null)
+            if (exists is null) // email/username in database
                 return BadRequest(new AuthResult()
                 {
                     Success = false,
@@ -111,16 +115,152 @@ namespace Foody.WebApi.Controllers.v1
                     }
                 });
 
-            var jwtToken = JwtToken(exists);
+            //var token = await JwtToken(exists);
 
-            return Ok(new AuthResult()
-            {
-                Token = jwtToken,
-                Success = true
-            });
+            return Ok(await JwtToken(exists));
         }
 
-        private string JwtToken(IdentityUser user)
+        [HttpPost]
+        [Route("RefreshToken")]
+        [ProducesResponseType(200, Type = typeof(AuthResult))]
+        public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto tokenRequestDto)
+        {
+            // check if token is valid
+            var result = await VerifyToken(tokenRequestDto);
+
+            if (result is null)
+                return BadRequest(new AuthResult()
+                {
+                    Success = false,
+                    Errors = new List<string>
+                    {
+                        "Token validation failure."
+                    }
+                });
+
+            return !result.Errors.Any() ? Ok(result) : BadRequest(result);
+        }
+
+        private async Task<AuthResult?> VerifyToken(TokenRequestDto tokenRequestDto)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(tokenRequestDto.Token, _tokenValidationParameters, out var validatedToken);
+
+                // validate token
+                if (validatedToken is JwtSecurityToken jwtSecurityToken)
+                {
+                    // check is algorithms match
+                    var result = jwtSecurityToken.Header.Alg
+                        .Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
+
+                    if (!result) return null;
+                }
+
+                long utcExpiration = long.Parse(principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Exp)!.Value);
+
+                var expDate = DateTimeOffset.FromUnixTimeSeconds(utcExpiration).UtcDateTime;
+
+                // check if jwt token has expired
+                if (expDate > DateTime.UtcNow)
+                    return new AuthResult()
+                    {
+                        Success = false,
+                        Errors = new List<string>
+                        {
+                            "Jwt Token has not expired.",
+                            "Cannot generate new token(s)."
+                        }
+                    };
+
+                var storedToken = _unitofWork.RefreshToken.Find(rt => rt.Token == tokenRequestDto.RefreshToken)
+                    .AsParallel().FirstOrDefault();
+
+                if (storedToken is null)
+                    return new AuthResult()
+                    {
+                        Success = false,
+                        Errors = new List<string>
+                        {
+                            "Invalid Token."
+                        }
+                    };
+
+                if (storedToken.IsUsed)
+                    return new AuthResult()
+                    {
+                        Success = false,
+                        Errors = new List<string>
+                        {
+                            "Invalid Token. Used!"
+                        }
+                    };
+
+                if (storedToken.IsRevoked)
+                    return new AuthResult()
+                    {
+                        Success = false,
+                        Errors = new List<string>
+                        {
+                            "Invalid Token. Revoked!"
+                        }
+                    };
+
+                if (storedToken.ExipryDate < DateTime.UtcNow)
+                    return new AuthResult()
+                    {
+                        Success = false,
+                        Errors = new List<string>
+                        {
+                            "Token has expired."
+                        }
+                    };
+
+                var jti = principal.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.Value;
+
+                if (storedToken.JwtId != jti)
+                    return new AuthResult()
+                    {
+                        Success = false,
+                        Errors = new List<string>
+                        {
+                            "Invalid Token."
+                        }
+                    };
+
+                // start processing
+                bool updated = await _unitofWork.RefreshToken.Update(storedToken);
+
+                if (!updated) return null;
+       
+                await _unitofWork.CompleteAsync();
+
+                // regenerate token
+                var dbUser = await _userManager.FindByIdAsync(storedToken.UserId);
+
+                if (dbUser is null)
+                    return new AuthResult()
+                    {
+                        Success = false,
+                        Errors = new List<string>
+                        {
+                            "Error Processing Request."
+                        }
+                    };
+
+                return await JwtToken(dbUser);
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null; // TODO implement errror handling
+            }
+        }
+
+        private async Task<AuthResult> JwtToken(IdentityUser user)
         {
             // responsiple for creating the token
             var handler = new JwtSecurityTokenHandler();
@@ -134,12 +274,11 @@ namespace Foody.WebApi.Controllers.v1
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("Id", user.Id),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    // used by the refresh token
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),  // used by the refresh token
                 }),
-                Expires = DateTime.UtcNow.AddHours(2), // TODO Update to 2 minutes
+                Expires = DateTime.UtcNow.Add(_jwtConfig.ExpiryTimeFrame),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -149,7 +288,47 @@ namespace Foody.WebApi.Controllers.v1
             // convert token into string
             var jwtToken = handler.WriteToken(token);
 
-            return jwtToken;
+            // generate refresh token
+            var refreshToken = new RefreshToken
+            {
+                UserId = user.Id,
+                Token = $"{RandomString(25)}-{Guid.NewGuid()}",
+                JwtId = token.Id,
+                IsUsed = false,
+                IsRevoked = false,
+                ExipryDate = DateTime.UtcNow.AddMonths(6),
+            };
+
+            _unitofWork.RefreshToken.Add(refreshToken);
+            await _unitofWork.CompleteAsync();
+
+            //var tokenData = new TokenData
+            //{
+            //    JwtToken = jwtToken,
+            //    RefreshToken = refreshToken.Token
+            //};
+
+            return new AuthResult()
+            {
+                Token = jwtToken,
+                RefreshToken = refreshToken.Token,
+                Success = true,
+            };
+        }
+
+        private static readonly Random seed = new();
+
+        private static string RandomString(int lenght)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                "abcdefghijklmnopqrstuvwxyz" +
+                "0123456789-@+.";
+
+            lock (seed)
+            {
+                return new string(Enumerable.Repeat(chars, lenght)
+                .Select(s => s[seed.Next(s.Length)]).ToArray());
+            }
         }
     }
 }
