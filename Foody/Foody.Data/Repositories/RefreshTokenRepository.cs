@@ -21,5 +21,18 @@ namespace Foody.Data.Repositories
             }
             catch (Exception) { return Enumerable.Empty<RefreshToken>(); }
         }
+
+        public async Task<bool> Update(RefreshToken storedToken)
+        {
+            try
+            {
+                var token = await _dbSet.Where(rt => rt.Token == storedToken.Token)
+                    .FirstAsync();
+
+                token.IsUsed = true;
+                return true;
+            }
+            catch(Exception) { return false; }
+        }
     }
 }

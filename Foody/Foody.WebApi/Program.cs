@@ -40,7 +40,7 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = ApiVersion.Default;
 });
 
-
+// Add TokenValidationParameters to DI
 var tokenValidationParams = new TokenValidationParameters
 {
     ValidateIssuer = false, // TODO Update to true
@@ -50,12 +50,11 @@ var tokenValidationParams = new TokenValidationParameters
     ValidateIssuerSigningKey = true,
     IssuerSigningKey = new SymmetricSecurityKey(
         Encoding.ASCII.GetBytes(builder.Configuration["JwtConfig:Secret"])),
-    ClockSkew = TimeSpan.Zero,
 };
 
-// Add TokenValidationParameters to DI
 builder.Services.AddSingleton(tokenValidationParams);
 
+//  Add jwt authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -67,6 +66,7 @@ builder.Services.AddAuthentication(options =>
     jwt.TokenValidationParameters = tokenValidationParams;
 });
 
+// AutoMapper DI
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
