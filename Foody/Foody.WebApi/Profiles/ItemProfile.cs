@@ -10,10 +10,11 @@ namespace Foody.WebApi.Profiles
     {
         public ItemProfile()
         {
-            CreateMap<Category, CategoryDto>()
-                .ReverseMap();
+            CreateMap<Category, CategoryDto>();
                 
             CreateMap<Category, CategoryDetailDto>();
+
+            CreateMap<CategoryModDto, Category>();
 
             CreateMap<Product, ProductDto>()
                 .ForMember(dto => dto.Category, opt => opt.MapFrom(src => src.Category.Name));

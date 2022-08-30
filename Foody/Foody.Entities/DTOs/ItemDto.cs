@@ -8,6 +8,15 @@ namespace Foody.Entities.DTOs;
 
 public class ItemDto
 {
+    public int Id { get; set; }
+
+    public string Name { get; set; }
+
+    public bool IsActive { get; set; }
+}
+
+public class ItemModDto
+{
     [Required]
     public string Name { get; set; }
 
@@ -31,6 +40,8 @@ public class ItemDetailDto : ItemDto
 
 
 public class CategoryDto : ItemDto { }
+
+public class CategoryModDto : ItemModDto { }
 
 public class CategoryDetailDto : ItemDetailDto { }
 
@@ -57,7 +68,7 @@ public class ProductDetailDto : ProductDto
     public DateTime Updated { get; set; }
 }
 
-public class ProductModDto : ItemDto
+public class ProductModDto : ItemModDto
 {
     [Required]
     public int Category { get; set; }
