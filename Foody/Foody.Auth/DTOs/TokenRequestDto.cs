@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Foody.Auth.DTOs;
+﻿namespace Foody.Auth.DTOs;
 
 public class TokenRequestDto
 {
