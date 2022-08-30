@@ -21,7 +21,7 @@ builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfi
 builder.Services.AddDbContext<FoodyDbContext>(option =>
     option.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<FoodyDbContext>();
 
 //Add UnitofWork DI

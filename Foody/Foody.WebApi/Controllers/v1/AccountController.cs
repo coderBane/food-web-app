@@ -24,13 +24,17 @@ namespace Foody.WebApi.Controllers.v1
 
         private readonly UserManager<IdentityUser> _userManager;
 
+        private readonly RoleManager<IdentityRole> _roleManager;
+
         private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public AccountController(IUnitofWork unitofWork, IMapper mapper, UserManager<IdentityUser> userManager,
+        public AccountController(IUnitofWork unitofWork, IMapper mapper,
+            UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
             IOptionsMonitor<JwtConfig> optionsMonitor, TokenValidationParameters tokenValidationParameters)
             : base(unitofWork, mapper)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _jwtConfig = optionsMonitor.CurrentValue;
             _tokenValidationParameters = tokenValidationParameters;
         }
@@ -78,6 +82,9 @@ namespace Foody.WebApi.Controllers.v1
                     Success = false,
                     Errors = created.Errors.Select(x => x.Description).ToList(),
                 });
+
+            // Default role
+            await _userManager.AddToRoleAsync(validUser, "User");
 
             // Generate jwt token
             //var token = await JwtToken(validUser);
@@ -268,16 +275,13 @@ namespace Foody.WebApi.Controllers.v1
             // the secret key
             var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
 
+            // get all the user claims
+            var claims = await ValidClaims(user);
+
             // information to create token
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("Id", user.Id),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),  // used by the refresh token
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.Add(_jwtConfig.ExpiryTimeFrame),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -314,6 +318,39 @@ namespace Foody.WebApi.Controllers.v1
                 RefreshToken = refreshToken.Token,
                 Success = true,
             };
+        }
+
+        private async Task<List<Claim>> ValidClaims(IdentityUser user)
+        {
+            var options = new IdentityOptions();
+
+            var claims = new List<Claim>
+            {
+                new Claim("Id", user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),  // used by the refresh token
+            };
+
+            // Add user claims
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            claims.AddRange(userClaims);
+
+            // Add user roles to claims
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var userRole in userRoles)
+            {
+                var role = await _roleManager.FindByNameAsync(userRole);
+
+                if (role is null) continue;
+
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
+
+                var roleClaims = await _roleManager.GetClaimsAsync(role);
+                claims.AddRange(roleClaims);
+            }
+
+            return claims;
         }
 
         private static readonly Random seed = new();
