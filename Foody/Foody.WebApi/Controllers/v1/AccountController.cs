@@ -93,7 +93,7 @@ namespace Foody.WebApi.Controllers.v1
             var exists = await _userManager.FindByEmailAsync(logInDto.Email) ??
                 await _userManager.FindByNameAsync(logInDto.Email);
 
-            if (exists is null) // email/username in database
+            if (exists is null) // email/username not in database
                 return BadRequest(new AuthResult()
                 {
                     Success = false,
