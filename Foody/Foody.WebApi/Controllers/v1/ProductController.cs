@@ -18,9 +18,9 @@ namespace Foody.WebApi.Controllers.v1
         [HttpGet]
         [HttpHead]
         [ProducesResponseType(200, Type = typeof(ProductDto))]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string? search)
         {
-            var products = await _unitofWork.Products.All();
+            var products = await _unitofWork.Products.All(search!);
             var _dto = _mapper.Map<List<ProductDto>>(products);
             return products is not null ? Ok(_dto) :
                 Problem("Entity set 'FoodyDbContext' is null.");

@@ -13,21 +13,21 @@ namespace Foody.WebApi.Controllers.v1
         {
         }
 
-        // GET: v/Categories
+        // GET: v1/Categories
         [HttpGet]
         [HttpHead]
         [ProducesResponseType(200, Type = typeof(CategoryDto))]
         public async Task<IActionResult> Get()
         { 
-            var result = await _unitofWork.Categories.All();
+            var result = await _unitofWork.Categories.All(string.Empty);
             var _dto = from c in result
                       select _mapper.Map<CategoryDto>(c);
 
             return _unitofWork.Categories is not null ? Ok(_dto) :
-                Problem("Entity set 'FoodyDbContext' is null");
+                Problem($"Entity set '{nameof(Category)}' is null", statusCode: 500);
         }
 
-        // GET: v/Category/5
+        // GET: v1/Category/5
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(CategoryDetailDto))]
         public async Task<IActionResult> Get(int id)
@@ -38,15 +38,15 @@ namespace Foody.WebApi.Controllers.v1
             return result is null ? NotFound() : Ok(_dto);
         }
 
-        // POST: v/Category
+        // POST: v1/Category
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(CategoryDetailDto))]
-        public async Task<IActionResult> Post([FromForm] CategoryDto categoryDto)
+        public async Task<IActionResult> Post([FromForm] CategoryModDto categoryModDto)
         {
-            var category = _mapper.Map<Category>(categoryDto);
-            await Upload(category, categoryDto.ImageUpload);
+            var category = _mapper.Map<Category>(categoryModDto);
+            await Upload(category, categoryModDto.ImageUpload);
 
-            ModelState.ClearValidationState(nameof(categoryDto));
+            ModelState.ClearValidationState(nameof(categoryModDto));
             if (!TryValidateModel(category))
             {
                 return UnprocessableEntity(ModelState);
@@ -60,20 +60,20 @@ namespace Foody.WebApi.Controllers.v1
             return CreatedAtAction(nameof(Get), new { id = category.Id}, _dto);
         }
 
-        // PUT: v/Category/5
+        // PUT: v1/Category/5
         [HttpPut("{id}")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Put(int id, [FromForm] CategoryDto categoryDto)
+        public async Task<IActionResult> Put(int id, [FromForm] CategoryModDto categoryModDto)
         {
             var category = await _unitofWork.Categories.Get(id);
 
             if (category is null)
                 return NotFound();
 
-            _mapper.Map(categoryDto, category);
-            await Upload(category, categoryDto.ImageUpload);
+            _mapper.Map(categoryModDto, category);
+            await Upload(category, categoryModDto.ImageUpload);
 
-            ModelState.ClearValidationState(nameof(categoryDto));
+            ModelState.ClearValidationState(nameof(categoryModDto));
             try
             {
                 if (!TryValidateModel(category))
@@ -90,7 +90,7 @@ namespace Foody.WebApi.Controllers.v1
             return NoContent();
         }
 
-        // DELETE v/Category/5
+        // DELETE v1/Category/5
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> Delete(int id)

@@ -12,7 +12,7 @@ public class CategoryRepository : Repository<Category>, ICategoryRepository
     {
     }
 
-    public override async Task<IEnumerable<Category>> All()
+    public override async Task<IEnumerable<Category>> All(string search)
     {
         return await _dbSet.Where(c => c.Status == 1)
                            .AsNoTracking()

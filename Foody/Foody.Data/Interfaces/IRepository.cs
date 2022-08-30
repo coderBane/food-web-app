@@ -3,11 +3,9 @@ using System.Linq.Expressions;
 
 namespace Foody.Data.Interfaces;
 
-/// <summary>Generic Repository</summary>
-/// <typeparam name="T">Model</typeparam>
 public interface IRepository<T> where T : class
 {
-    Task<IEnumerable<T>> All();
+    Task<IEnumerable<T>> All(string search);
 
     Task<T?> Get(int id);
 
