@@ -23,6 +23,16 @@ namespace Foody.WebApi.Controllers.v1
             _mapper = mapper;
         }
 
+        internal static Error AddError(int code, string title, string message)
+        {
+            return new Error
+            {
+                Code = code,
+                Title = title,
+                Message = message
+            };
+        }
+
         [NonAction]
         public static async Task Upload<T>(T entity, IFormFile file) where T : Item
         {
