@@ -68,7 +68,11 @@ namespace Foody.WebApi.Controllers.v1
                     Errors = response.Errors.Select(e => e.Description)
                 });
 
-            return Ok();
+            return Ok(new
+            {
+                Success = true,
+                Message = $"User '{user.UserName}' now has '{userRole.Role}' priviledges."
+            });
         }
 
         [HttpPost]
@@ -102,7 +106,11 @@ namespace Foody.WebApi.Controllers.v1
                     Errors = response.Errors.Select(e => e.Description)
                 });
 
-            return Ok($"User '{user.UserName}' '{userRole.Role}' priviledges have been revoked.");
+            return Ok(new
+            {
+                Success = true,
+                Message = $"User '{user.UserName}' '{userRole.Role}' priviledges have been revoked."
+            });
         }
     }
 }

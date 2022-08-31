@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Foody.Entities.Models
 {
@@ -23,7 +22,6 @@ namespace Foody.Entities.Models
 
         [ForeignKey(nameof(UserId))]
         public IdentityUser User { get; set; } = null!;
-
     }
 }
 
