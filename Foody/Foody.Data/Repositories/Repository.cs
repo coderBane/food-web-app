@@ -22,7 +22,7 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet.Add(entity);
     }
 
-    public virtual async Task<IEnumerable<T>> All()
+    public virtual async Task<IEnumerable<T>> All(string search)
     {
        return await _dbSet.ToListAsync();
     }

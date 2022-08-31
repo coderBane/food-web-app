@@ -1,6 +1,3 @@
-global using System.ComponentModel.DataAnnotations;
-global using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Foody.Entities.Models;
 
 public abstract class BaseEntity

@@ -11,7 +11,7 @@ namespace Foody.Data.Repositories
         {
         }
 
-        public override async Task<IEnumerable<RefreshToken>> All()
+        public override async Task<IEnumerable<RefreshToken>> All(string? search)
         {
             try
             {

@@ -3,6 +3,7 @@ using Foody.Data.Data;
 using Foody.Entities.Models;
 using Foody.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Foody.Data.Repositories
 {
@@ -12,11 +13,17 @@ namespace Foody.Data.Repositories
         { 
         }
 
-        public override async Task<IEnumerable<Product>> All()
+        public override async Task<IEnumerable<Product>> All(string search)
         {
             var products = _dbSet.Where(p => p.Status == 1)
                 .Include(p => p.Category)
                 .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search)) {
+                string s = search.ToLower();
+                products = products.Where(p =>
+                    p.Name.ToLower().Contains(s) || p.Category.Name.ToLower().Contains(s));
+            }
 
             return await products.AsNoTracking().ToListAsync();
         }
