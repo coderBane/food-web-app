@@ -6,5 +6,5 @@
 *.db-shm
 *.db-wal
 
-client
+foody-web
 Foody.Web
