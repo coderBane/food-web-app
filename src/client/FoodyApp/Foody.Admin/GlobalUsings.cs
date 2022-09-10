@@ -12,12 +12,12 @@ global using System.Collections.ObjectModel;
 global using Foody.Admin.Models;
 global using Foody.Admin.Manager;
 global using Foody.Admin.Utilities;
-global using Foody.Admin.ViewModels;
 global using Foody.Admin.Rest.Interfaces;
 #endregion
 
 #region Mvvm
 global using Microsoft.Toolkit.Mvvm.Input;
+global using Microsoft.Toolkit.Mvvm.ComponentModel;
 #endregion
 
 #endregion

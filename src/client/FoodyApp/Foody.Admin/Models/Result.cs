@@ -8,6 +8,6 @@ public class Result<T>
 
     public bool Success { get; set; }
 
-    public DateTime Date { get; set; } 
+    public DateTime Date { get; set; }
 }
 
