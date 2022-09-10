@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:icons="clr-namespace:Foody.Admin.Utilities"
+             x:Class="Foody.Admin.Control.TopGridView">
+
+    <Grid HeightRequest="260" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-40" Source="navbar_cover2.jpg" Aspect="AspectFill"
+               Opacity="0.9"/>
+
+        <HorizontalStackLayout Grid.Column="0" Spacing="20" VerticalOptions="Center">
+            <BoxView Color="White" WidthRequest="195" HeightRequest="65"></BoxView>
+
+            <Label Text="Welcome back, Boss" FontSize="Subtitle" FontAttributes="Bold"
+                  VerticalTextAlignment="Center"/>
+        </HorizontalStackLayout>
+
+        <Label Grid.Column="1" Text="Friday, 12 April 2021" FontSize="Subtitle" FontAttributes="Bold"
+                       VerticalTextAlignment="Center" HorizontalOptions="End"/>
+
+
+        <Frame Grid.Row="1" Grid.ColumnSpan="2" HeightRequest="70" BackgroundColor="WhiteSmoke"
+               VerticalOptions="Center" CornerRadius="0">
+
+            <Grid ColumnDefinitions="*,*,*,Auto,Auto" Padding="10,0">
+                <Entry Grid.Column="0" TextColor="Black" Placeholder="Search here"
+                       HeightRequest="40"/>
+
+                <Image Grid.Column="1" Source="{x:Static icons:Icons.Server}" HorizontalOptions="Start"/>
+
+                <HorizontalStackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Image Source="{x:Static icons:Icons.Badge}" WidthRequest="35" HeightRequest="35"/>
+                    <Label Text="Admin" TextColor="Black" FontSize="Medium" Padding="10"
+                           VerticalTextAlignment="Center"/>
+                    <Image Source="{x:Static icons:Icons.ArrowDownBlk}" WidthRequest="35" HeightRequest="35"/>
+                </HorizontalStackLayout>
+
+                <Image Grid.Column="3" Source="{x:Static icons:Icons.Language}"/>
+                <Image Grid.Column="4" Source="{x:Static icons:Icons.Clock}"/>
+
+            </Grid>
+
+        </Frame>
+
+    </Grid>
+
+</ContentView>
+

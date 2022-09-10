@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Foody.Admin.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:Foody.Admin"
+    xmlns:pages="clr-namespace:Foody.Admin.Pages"
+    xmlns:icons="clr-namespace:Foody.Admin.Utilities"
+    Shell.TabBarIsVisible="False"
+    Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
+
+    <Shell.FlyoutHeader>
+        <Grid HeightRequest="15">
+            <Label Text="Navigation"/>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <ShellContent
+        FlyoutItemIsVisible="False"
+        Shell.FlyoutBehavior="Disabled"
+        ContentTemplate="{DataTemplate pages:LoginPage}"
+        Route="LoginPage" />
+
+    <FlyoutItem Title="Dashboard" Icon="{x:Static icons:Icons.Dashboard}">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:DashboardPage}"/>
+
+    </FlyoutItem>
+    <FlyoutItem Title="Items" Icon="{x:Static icons:Icons.Items}">
+        <ShellContent Title="Category" Icon="{x:Static icons:Icons.Categories}"
+            ContentTemplate="{DataTemplate pages:Category.CategoryPage}"/>
+
+    </FlyoutItem>
+
+</Shell>
+

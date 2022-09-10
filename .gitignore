@@ -1,11 +1,10 @@
 .DS_Store
+.vs
 .vscode
 
 *.db
 *.db-shm
 *.db-wal
 
-
-foody-app
-Foody.Admin
+foody-web
 Foody.Web

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:Foody.Admin.ViewModels.Category"
+             x:DataType="viewmodel:CategoryDetailsVM"
+             x:Class="Foody.Admin.Pages.Category.DetailsPage"
+             BackgroundColor="WhiteSmoke"
+             Shell.PresentationMode="ModalAnimated"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="Black"/>
+            <Setter Property="FontSize" Value="Medium"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="WidthRequest" Value="100"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="30" Margin="50,50">
+
+            <Label Text="{Binding Category.Name, StringFormat='Category: {0}'}"
+                   FontSize="Subtitle" FontAttributes="Bold"/>
+
+            <Line BackgroundColor="LightGray" HeightRequest="2"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Frame BackgroundColor="White" HeightRequest="400" WidthRequest="400"
+                       IsClippedToBounds="True">
+                    <Image Aspect="AspectFit" HeightRequest="390" WidthRequest="390"
+                           HorizontalOptions="Center" VerticalOptions="Center"
+                           Source="{Binding Category.ImageUri}"/>
+                </Frame>
+
+               <VerticalStackLayout Grid.Column="1" Spacing="10" Padding="10">
+                    <Label Text="{Binding Category.Name, StringFormat='Name: {0}'}"/>
+                    <Label Text="{Binding Category.IsActive, StringFormat='Status: {0}'}"/>
+                    <Label Text="{Binding Category.AddedOn, StringFormat='Created: {0}'}"/>
+                    <Label Text="{Binding Category.Updated, StringFormat='Updated: {0}'}"/>
+               </VerticalStackLayout>
+            </Grid>
+
+            <HorizontalStackLayout Spacing="15">
+                <Button Text="Edit"/>
+                <Button Text="Back" Command="{Binding GoBackCommand}"/>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
