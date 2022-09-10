@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:Foody.Admin.Models"
+             xmlns:viewmodel="clr-namespace:Foody.Admin.ViewModels.Category"
+             xmlns:control="clr-namespace:Foody.Admin.Control"
+             xmlns:icons="clr-namespace:Foody.Admin.Utilities"
+             x:DataType="viewmodel:CategoryVM"
+             x:Class="Foody.Admin.Pages.Category.CategoryPage"
+             BackgroundColor="WhiteSmoke"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="Black"/>
+            <Setter Property="FontSize" Value="Medium"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="40,0,40,60">
+
+        <control:TopGridView Margin="-40,0"/>
+
+        <Grid Grid.Row="1" Margin="0,40" Padding="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <HorizontalStackLayout Spacing="20" VerticalOptions="StartAndExpand">
+                <Button Text="Create" WidthRequest="80"/>
+                <ImageButton Source="{x:Static icons:Icons.Refresh}"
+                             IsEnabled="{Binding IsNotBusy}"
+                             Command="{Binding CategoryListCommand}"/>
+            </HorizontalStackLayout>
+
+            <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*"  ColumnDefinitions="*,*,*" Margin="0,20" RowSpacing="20">
+                <Entry Placeholder="Find..." TextColor="Black" Grid.Column="0"/>
+                <Line HeightRequest="1" BackgroundColor="LightGray" Grid.Row="1" Grid.ColumnSpan="3"/>
+              
+                <CollectionView ItemsSource="{Binding Categories}" Grid.Row="2" Grid.ColumnSpan="3"
+                                SelectionMode="None"
+                                EmptyView="No data...">
+                    <CollectionView.Header>
+                        <Grid>
+                            <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="0">
+                                <Grid ColumnDefinitions="*,*,*">    
+                                    <Label Grid.Column="0" Text="ID" BackgroundColor="Aquamarine"/>
+                                    <Label Grid.Column="1" Text="Name" BackgroundColor="Bisque"/>
+                                    <Label Grid.Column="2" Text="Status" BackgroundColor="BlueViolet"/>
+                                </Grid>
+                            </Frame>
+                        </Grid>
+                    </CollectionView.Header>
+                        
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Category">
+
+                            <Frame BackgroundColor="LightGrey" BorderColor="DarkGray" CornerRadius="0">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        CommandParameter="{Binding .}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:CategoryVM}}, Path=GetCategoryCommand}"/>
+                                </Frame.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="*,*,*">
+                                    <Label Grid.Column="0" Text="{Binding Id}"/>
+                                    <Label Grid.Column="1" Text="{Binding Name}" Padding="10,0"/>
+                                    <Label Grid.Column="2" Text="{Binding IsActive}" Padding="20,0"/>
+                                </Grid>
+                            </Frame>
+                           
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+            <ActivityIndicator Grid.RowSpan="2"
+                               IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"
+                               VerticalOptions="CenterAndExpand"
+                               HorizontalOptions="FillAndExpand"/>
+            
+        </Grid>
+
+        <control:FooterView Grid.Row="2"/>
+
+    </Grid>
+
+</ContentPage>

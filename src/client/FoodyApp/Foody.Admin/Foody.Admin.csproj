@@ -53,10 +53,16 @@
 	  <MauiXaml Update="Pages\DashboardPage.xaml">
 	    <SubType></SubType>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\CategoryPage.xaml">
+	  <MauiXaml Update="Control\TopGridView.xaml">
 	    <SubType></SubType>
 	  </MauiXaml>
-	  <MauiXaml Update="Control\TopGridView.xaml">
+	  <MauiXaml Condition=" '$(EnableDefaultXamlItems)' == 'true' " Update="Pages\Category\CategoryPage.xaml">
+	    <SubType></SubType>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Category\DetailsPage.xaml">
+	    <SubType></SubType>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Category\ModifyPage.xaml">
 	    <SubType></SubType>
 	  </MauiXaml>
 	</ItemGroup>
