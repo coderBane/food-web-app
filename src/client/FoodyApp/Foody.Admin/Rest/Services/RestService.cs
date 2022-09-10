@@ -1,4 +1,6 @@
-﻿namespace Foody.Admin.Rest.Services;
+﻿using System.Net.Http.Headers;
+
+namespace Foody.Admin.Rest.Services;
 
 public class RestService<T> : IRestService<T> where T : class
 {
@@ -6,6 +8,7 @@ public class RestService<T> : IRestService<T> where T : class
     protected string url;
 
     PagedResult<T> result;
+    Result<dynamic> single;
 
     public RestService()
     {
@@ -35,7 +38,31 @@ public class RestService<T> : IRestService<T> where T : class
         return result;
     }
 
-    public Task<T> GetAsync(int id)
+    public async Task<Result<dynamic>> GetAsync(int id)
+    {
+        try
+        {
+            var response = await _client.GetAsync($"{url}/{id}");
+            response.EnsureSuccessStatusCode();
+            single = await response.Content.ReadFromJsonAsync<Result<dynamic>>();
+
+            if (!single.Success)
+                Debug.WriteLine($"{result.Error.Title} : {result.Error.Message}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+
+        return single;
+    }
+
+    public Task<Result<dynamic>> SaveDataAsync(T entity, bool isNew = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<T>> DeleteAsync(int id)
     {
         throw new NotImplementedException();
     }
