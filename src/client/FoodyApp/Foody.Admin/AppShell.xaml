@@ -7,7 +7,7 @@
     xmlns:pages="clr-namespace:Foody.Admin.Pages"
     xmlns:icons="clr-namespace:Foody.Admin.Utilities"
     Shell.TabBarIsVisible="False"
-    Shell.FlyoutBehavior="{OnIdiom Desktop=Locked}">
+    Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
 
     <Shell.FlyoutHeader>
         <Grid HeightRequest="15">
@@ -28,7 +28,7 @@
     </FlyoutItem>
     <FlyoutItem Title="Items" Icon="{x:Static icons:Icons.Items}">
         <ShellContent Title="Category" Icon="{x:Static icons:Icons.Categories}"
-            ContentTemplate="{DataTemplate pages:CategoryPage}"/>
+            ContentTemplate="{DataTemplate pages:Category.CategoryPage}"/>
 
     </FlyoutItem>
 

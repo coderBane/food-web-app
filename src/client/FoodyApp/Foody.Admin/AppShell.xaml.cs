@@ -9,6 +9,7 @@ public partial class AppShell : Shell
 		InitializeComponent();
 
 		Routing.RegisterRoute(nameof(DashboardPage), typeof(DashboardPage));
+		Routing.RegisterRoute("categorydeet", typeof(Pages.Category.DetailsPage));
 	}
 }
 

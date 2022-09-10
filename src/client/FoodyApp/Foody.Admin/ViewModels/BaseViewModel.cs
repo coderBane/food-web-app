@@ -9,6 +9,9 @@ public partial class BaseViewModel : ObservableObject
     bool isBusy;
 
     [ObservableProperty]
+    bool isRefreshing; 
+
+    [ObservableProperty]
     string title;
 
     protected readonly IDataManager dataManager;
@@ -20,5 +23,10 @@ public partial class BaseViewModel : ObservableObject
     }
 
     public bool IsNotBusy => !IsBusy;
+
+    internal static T ToObject<T>(JsonElement element)
+    {
+        return JsonSerializer.Deserialize<T>(element, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    }
 }
 

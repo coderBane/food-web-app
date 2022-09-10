@@ -1,4 +1,5 @@
 ﻿using Foody.Admin.Pages;
+using Foody.Admin.ViewModels.Category;
 using Foody.Admin.Authentication.Services;
 using Foody.Admin.Authentication.Interfaces;
 
@@ -26,9 +27,11 @@ public static class MauiProgram
 
 		//ViewModels
 		builder.Services.AddSingleton<CategoryVM>();
+		builder.Services.AddTransient<CategoryDetailsVM>();
 
 		//Pages
-		builder.Services.AddSingleton<CategoryPage>();
+		builder.Services.AddSingleton<Pages.Category.CategoryPage>();
+		builder.Services.AddTransient<Pages.Category.DetailsPage>();
 
 		return builder.Build();
 	}
