@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Data.SqlClient;
 
 using Foody.Data.Data;
 using Foody.Data.Interfaces;
@@ -10,9 +11,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+using WatchDog;
+
 var builder = WebApplication.CreateBuilder(args);
 
-//Add services to the container.
+/***Add services to the container.**/
+
+var conndb = new StringBuilder(builder.Configuration.GetConnectionString("postgres"));
+conndb.Append($"User Id={builder.Configuration["Postgres:User"]};");
+conndb.Append($"Password={builder.Configuration["Postgres:Password"]};");
+conndb.Append($"Integrated Security=true;Pooling=true;");
 
 //Update JWT class
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
@@ -66,6 +74,14 @@ builder.Services.AddAuthentication(options =>
     jwt.TokenValidationParameters = tokenValidationParams;
 });
 
+// WatchDog DI
+builder.Services.AddWatchDogServices(options =>
+{
+    options.IsAutoClear = false;
+    options.SetExternalDbConnString = conndb.ToString();
+    options.SqlDriverOption = WatchDog.src.Enums.WatchDogSqlDriverEnum.PostgreSql;
+});
+
 // AutoMapper DI
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -76,8 +92,8 @@ using(var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    using var content = services.GetRequiredService<FoodyDbContext>();
-    DbInitialize.Initialize(content);
+    var password = builder.Configuration.GetValue<string>("UserPW");
+    DbInitialize.Initialize(services, password);
 }
 /****************************/
 
@@ -91,11 +107,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseDefaultFiles();
 app.UseStaticFiles();
+
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// watchdog middleware
+app.UseWatchDogExceptionLogger();
+app.UseWatchDog(opt =>
+{
+    opt.WatchPageUsername = builder.Configuration["WatchDog:Username"] ;
+    opt.WatchPagePassword = builder.Configuration["WatchDog:Password"];
+});
 
 app.Run();
