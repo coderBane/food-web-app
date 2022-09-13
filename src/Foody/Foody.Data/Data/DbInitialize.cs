@@ -1,13 +1,26 @@
 ﻿using System;
 using Foody.Entities.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace Foody.Data.Data
 {
     public static class DbInitialize
     {
-        public static void Initialize(FoodyDbContext context)
+        public static async void Initialize(IServiceProvider serviceProvider, string pw)
         {
-            if (context.Categories.Any())
+            using var context = serviceProvider.GetRequiredService<FoodyDbContext>();
+
+            var userId = await NewUser(serviceProvider, pw);
+            await NewRole(serviceProvider, userId);
+
+            SeedData(context);
+        }
+
+        public static void SeedData(FoodyDbContext context)
+        {
+            if (context.Items.Any())
                 return;
 
             new List<Category>()
@@ -35,6 +48,57 @@ namespace Foody.Data.Data
             }.ForEach(x => context.Products.Add(x));
 
             context.SaveChanges();
+        }
+
+        public static async Task<string> NewUser(IServiceProvider serviceProvider, string pass)
+        {
+            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+
+            if (userManager is null)
+                throw new NullReferenceException($"{nameof(userManager)} is null");
+
+            var user = await userManager.FindByNameAsync("admin");
+
+            if (user is null)
+            {
+                user = new IdentityUser("admin")
+                {
+                    Email = "admin@foody.com",
+                    EmailConfirmed = true
+                };
+                await userManager.CreateAsync(user, pass);
+            }   
+
+            return user.Id;
+        }
+
+        public static async Task<IdentityResult> NewRole(IServiceProvider serviceProvider, string uid)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            if (roleManager is null)
+                throw new NullReferenceException($"{nameof(roleManager)} is null");
+
+            IdentityResult IR;
+
+            if (!await roleManager.RoleExistsAsync("Admin"))
+                IR = await roleManager.CreateAsync(new IdentityRole("Admin"));
+            if (!await roleManager.RoleExistsAsync("User"))
+                IR = await roleManager.CreateAsync(new IdentityRole("User"));
+
+            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+
+            if (userManager is null)
+                throw new NullReferenceException($"{nameof(userManager)} is null");
+
+            var user = await userManager.FindByIdAsync(uid);
+
+            if (user is null)
+                throw new NullReferenceException("User not found!");
+
+            IR = await userManager.AddToRolesAsync(user, new List<string>(){ "Admin", "User" });
+
+            return IR;
         }
     }
 }
