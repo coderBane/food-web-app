@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Foody.Data.Repositories
 {
-    public class RefreshTokenRepository : Repository<RefreshToken>, IRefreshTokenRepository
+    public sealed class RefreshTokenRepository : Repository<RefreshToken>, IRefreshTokenRepository
     {
         public RefreshTokenRepository(FoodyDbContext context) : base(context)
         {
@@ -15,7 +15,7 @@ namespace Foody.Data.Repositories
         {
             try
             {
-                return await _dbSet.Where(rt => rt.Status == 1)
+                return await _dbSet.Where(rt => rt.State == 1)
                     .AsNoTracking()
                     .ToListAsync();
             }
@@ -27,9 +27,9 @@ namespace Foody.Data.Repositories
             try
             {
                 var token = await _dbSet.Where(rt => rt.Token == storedToken.Token)
-                    .FirstAsync();
+                    .SingleOrDefaultAsync();
 
-                token.IsUsed = true;
+                token!.IsUsed = true;
                 return true;
             }
             catch(Exception) { return false; }

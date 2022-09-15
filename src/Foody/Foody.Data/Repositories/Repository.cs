@@ -32,7 +32,7 @@ public class Repository<T> : IRepository<T> where T : class
         var entity = await Get(id);
 
         if (entity is null)
-            throw new NullReferenceException(nameof(entity) + " Was not found");
+            throw new NullReferenceException(nameof(entity) + $"with given id was not found");
 
         _dbSet.Remove(entity);
     }
