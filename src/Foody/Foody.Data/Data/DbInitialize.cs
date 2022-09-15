@@ -8,7 +8,7 @@ namespace Foody.Data.Data
 {
     public static class DbInitialize
     {
-        public static async void Initialize(IServiceProvider serviceProvider, string pw)
+        public static async Task InitializeAsync(IServiceProvider serviceProvider, string pw)
         {
             using var context = serviceProvider.GetRequiredService<FoodyDbContext>();
 
@@ -36,14 +36,14 @@ namespace Foody.Data.Data
 
             new List<Product>()
             {
-                new() { Name = "Jambalaya", CategoryId = 1, IsActive = true, Price = 3000, Description = Faker.Lorem.Sentence() },
-                new() { Name = "Jollof Rice", CategoryId = 1, IsActive = true, Price = 1500, Description = "The Best party rice." },
-                new() { Name = "Beef", CategoryId = 2, Price = 800 },
-                new() { Name = "Chicken", CategoryId = 2, Price = 1000, Description = "Juicy lap" },
-                new() { Name = "Asun", CategoryId = 3, IsActive = true, Price = 1500, Description = "Assorted meat (spicy)." },
-                new() { Name = "puff puff", CategoryId = 3, IsActive = true, Price = 500, Description = "Sweet dough balls." },
-                new() { Name = "Mango Juice", CategoryId = 4, Price = 1500},
-                new() { Name = "Zobo", CategoryId = 4, IsActive = true, Price = 1000, Description = "Purple hibiscus drink" },
+                new() { Name = "Jambalaya", CategoryId = 101, IsActive = true, Price = 3000, Description = Faker.Lorem.Sentence() },
+                new() { Name = "Jollof Rice", CategoryId = 101, IsActive = true, Price = 1500, Description = "The Best party rice." },
+                new() { Name = "Beef", CategoryId = 102, Price = 800 },
+                new() { Name = "Chicken", CategoryId = 102, Price = 1000, Description = "Juicy lap" },
+                new() { Name = "Asun", CategoryId = 103, IsActive = true, Price = 1500, Description = "Assorted meat (spicy)." },
+                new() { Name = "puff puff", CategoryId = 103, IsActive = true, Price = 500, Description = "Sweet dough balls." },
+                new() { Name = "Mango Juice", CategoryId = 104, Price = 1500},
+                new() { Name = "Zobo", CategoryId = 104, IsActive = true, Price = 1000, Description = "Purple hibiscus drink" },
 
             }.ForEach(x => context.Products.Add(x));
 
@@ -72,19 +72,17 @@ namespace Foody.Data.Data
             return user.Id;
         }
 
-        public static async Task<IdentityResult> NewRole(IServiceProvider serviceProvider, string uid)
+        public static async Task NewRole(IServiceProvider serviceProvider, string uid)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             if (roleManager is null)
                 throw new NullReferenceException($"{nameof(roleManager)} is null");
 
-            IdentityResult IR;
-
             if (!await roleManager.RoleExistsAsync("Admin"))
-                IR = await roleManager.CreateAsync(new IdentityRole("Admin"));
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
             if (!await roleManager.RoleExistsAsync("User"))
-                IR = await roleManager.CreateAsync(new IdentityRole("User"));
+                await roleManager.CreateAsync(new IdentityRole("User"));
 
             var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
 
@@ -96,9 +94,10 @@ namespace Foody.Data.Data
             if (user is null)
                 throw new NullReferenceException("User not found!");
 
-            IR = await userManager.AddToRolesAsync(user, new List<string>(){ "Admin", "User" });
-
-            return IR;
+            if (!await userManager.IsInRoleAsync(user, "Admin") ) 
+                await userManager.AddToRoleAsync(user, "Admin");
+            if (!await userManager.IsInRoleAsync(user, "User"))
+                await userManager.AddToRoleAsync(user, "User");
         }
     }
 }
