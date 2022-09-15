@@ -18,20 +18,29 @@ namespace Foody.Data.Data
 
         public FoodyDbContext(DbContextOptions<FoodyDbContext> options) : base(options) { }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionbuilder) =>
-            optionbuilder.UseLoggerFactory(_loggerFactory);
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+            optionsBuilder.UseLoggerFactory(_loggerFactory);
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
 
-            builder.Entity<Item>(b =>
+            modelBuilder.Entity<Item>(b =>
             {
+                b.Property(i => i.Id)
+                 .HasIdentityOptions(startValue: 101);
+
                 b.HasIndex(i => i.Name)
+                 .HasDatabaseName("ItemNameIndex")
                  .IsUnique();
 
                 b.HasDiscriminator();
+
+                b.HasComment("Table which implements table-per-heirachy inheritance (TPH)" + "\n" +
+                    "Contains data for both Categories and Product.");
             });
+
+            modelBuilder.HasDefaultSchema("api");
         }
     }
 }

@@ -17,17 +17,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 /***Add services to the container.**/
 
-var conndb = new StringBuilder(builder.Configuration.GetConnectionString("postgres"));
-conndb.Append($"User Id={builder.Configuration["Postgres:User"]};");
-conndb.Append($"Password={builder.Configuration["Postgres:Password"]};");
-conndb.Append($"Integrated Security=true;Pooling=true;");
-
 //Update JWT class
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
 //Add DbContext DI
-builder.Services.AddDbContext<FoodyDbContext>(option =>
-    option.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+//builder.Services.AddDbContext<FoodyDbContext>(option =>
+//    option.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+
+var foodydb = new StringBuilder(builder.Configuration.GetConnectionString("foody"));
+foodydb.Append($"User Id={builder.Configuration["Postgres:User"]};");
+foodydb.Append($"Password={builder.Configuration["Postgres:Password"]};");
+foodydb.Append($"Integrated Security=true;Pooling=true;");
+
+builder.Services.AddDbContext<FoodyDbContext>(options =>
+options.UseNpgsql(foodydb.ToString())
+       .UseSnakeCaseNamingConvention());
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<FoodyDbContext>();
@@ -75,12 +79,12 @@ builder.Services.AddAuthentication(options =>
 });
 
 // WatchDog DI
-builder.Services.AddWatchDogServices(options =>
-{
-    options.IsAutoClear = false;
-    options.SetExternalDbConnString = conndb.ToString();
-    options.SqlDriverOption = WatchDog.src.Enums.WatchDogSqlDriverEnum.PostgreSql;
-});
+//builder.Services.AddWatchDogServices(options =>
+//{
+//    options.IsAutoClear = false;
+//    options.SetExternalDbConnString = foodydb.ToString();
+//    options.SqlDriverOption = WatchDog.src.Enums.WatchDogSqlDriverEnum.PostgreSql;
+//});
 
 // AutoMapper DI
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -88,12 +92,12 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 /*** Initialize Database ***/
-using(var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
     var password = builder.Configuration.GetValue<string>("UserPW");
-    DbInitialize.Initialize(services, password);
+    await DbInitialize.InitializeAsync(services, password);
 }
 /****************************/
 
@@ -118,11 +122,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 // watchdog middleware
-app.UseWatchDogExceptionLogger();
-app.UseWatchDog(opt =>
-{
-    opt.WatchPageUsername = builder.Configuration["WatchDog:Username"] ;
-    opt.WatchPagePassword = builder.Configuration["WatchDog:Password"];
-});
+//app.UseWatchDogExceptionLogger();
+//app.UseWatchDog(opt =>
+//{
+//    opt.WatchPageUsername = builder.Configuration["WatchDog:Username"] ;
+//    opt.WatchPagePassword = builder.Configuration["WatchDog:Password"];
+//});
 
 app.Run();

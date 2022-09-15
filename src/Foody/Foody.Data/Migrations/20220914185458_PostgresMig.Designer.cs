@@ -3,6 +3,7 @@ using System;
 using Foody.Data.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Foody.Data.Migrations
 {
     [DbContext(typeof(FoodyDbContext))]
-    partial class FoodyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220914185458_PostgresMig")]
+    partial class PostgresMig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,59 +24,6 @@ namespace Foody.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Foody.Entities.Models.AppFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id")
-                        .HasColumnOrder(0);
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AddedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("added_on");
-
-                    b.Property<byte[]>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1048576)
-                        .HasColumnType("bytea")
-                        .HasColumnName("content");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("description");
-
-                    b.Property<string>("FileExtension")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("file_extension");
-
-                    b.Property<decimal>("Size")
-                        .HasColumnType("numeric")
-                        .HasColumnName("size");
-
-                    b.Property<int>("State")
-                        .HasColumnType("integer")
-                        .HasColumnName("state");
-
-                    b.Property<string>("UntrustedName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("untrusted_name");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated");
-
-                    b.HasKey("Id")
-                        .HasName("pk_app_file");
-
-                    b.ToTable("app_file", "api");
-                });
 
             modelBuilder.Entity("Foody.Entities.Models.Item", b =>
                 {
@@ -96,9 +45,11 @@ namespace Foody.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("discriminator");
 
-                    b.Property<int>("ImageId")
-                        .HasColumnType("integer")
-                        .HasColumnName("image_id");
+                    b.Property<byte[]>("ImageData")
+                        .IsRequired()
+                        .HasMaxLength(2097152)
+                        .HasColumnType("bytea")
+                        .HasColumnName("image_data");
 
                     b.Property<string>("ImageUri")
                         .IsRequired()
@@ -126,9 +77,6 @@ namespace Foody.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_items");
-
-                    b.HasIndex("ImageId")
-                        .HasDatabaseName("ix_items_image_id");
 
                     b.HasIndex("Name")
                         .IsUnique()
@@ -474,18 +422,6 @@ namespace Foody.Data.Migrations
                         .HasDatabaseName("ix_items_category_id");
 
                     b.HasDiscriminator().HasValue("Product");
-                });
-
-            modelBuilder.Entity("Foody.Entities.Models.Item", b =>
-                {
-                    b.HasOne("Foody.Entities.Models.AppFile", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_items_app_file_image_id");
-
-                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("Foody.Entities.Models.RefreshToken", b =>
