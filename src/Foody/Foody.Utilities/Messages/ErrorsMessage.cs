@@ -16,6 +16,7 @@ public static class ErrorsMessage
     public static class Category
     {
         public const string NotExist = "Category does not exist";
+        public const string Exists = "Category with given name already in database";
     }
 }
 
