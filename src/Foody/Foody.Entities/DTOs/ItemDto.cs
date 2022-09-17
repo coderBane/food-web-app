@@ -1,9 +1,18 @@
 ﻿#nullable disable
 
-using System.Text.Json.Serialization;
+using Foody.Entities.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace Foody.Entities.DTOs;
+
+public class Image
+{
+    public int Id { get; set; }
+
+    public decimal FileSize { get; set; }
+
+    public byte[] Content { get; set; }
+}
 
 public class ItemDto
 {
@@ -22,15 +31,14 @@ public class ItemModDto
     [DefaultValue(false)]
     public bool IsActive { get; set; }
 
-    [JsonIgnore]
     public IFormFile ImageUpload { get; set; }
 }
 
 public class ItemDetailDto : ItemDto
 {
-    public string  ImageUri { get; set; }
+    public string ImageUri { get; set; }
 
-    public byte[] ImageData { get; set; }
+    public Image Image { get; set; }
 
     public DateTime AddedOn { get; set; }
 
@@ -60,7 +68,7 @@ public class ProductDetailDto : ProductDto
 {
     public string ImageUri { get; set; }
 
-    public byte[] ImageData { get; set; }
+    public Image Image { get; set; }
 
     public DateTime AddedOn { get; set; }
 
