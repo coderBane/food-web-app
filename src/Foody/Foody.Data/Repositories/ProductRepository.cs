@@ -1,13 +1,12 @@
-﻿using System;
-using Foody.Data.Data;
+﻿using Foody.Data.Data;
 using Foody.Entities.Models;
 using Foody.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+
 
 namespace Foody.Data.Repositories
 {
-    public class ProductRepository : Repository<Product>, IProductRepository
+    public sealed class ProductRepository : ItemRepository<Product>, IProductRepository
     {
         public ProductRepository(FoodyDbContext context) : base(context)
         { 
@@ -15,11 +14,12 @@ namespace Foody.Data.Repositories
 
         public override async Task<IEnumerable<Product>> All(string search)
         {
-            var products = _dbSet.Where(p => p.Status == 1)
+            var products = _dbSet.Where(p => p.State == 1)
                 .Include(p => p.Category)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(search)) {
+            if (!string.IsNullOrEmpty(search))
+            {
                 string s = search.ToLower();
                 products = products.Where(p =>
                     p.Name.ToLower().Contains(s) || p.Category.Name.ToLower().Contains(s));
@@ -30,19 +30,16 @@ namespace Foody.Data.Repositories
 
         public override async Task<Product?> Get(int id)
         {
-            return await _dbSet.Where(p => p.Status == 1)
+            return await _dbSet.Where(p => p.State == 1)
+                .Include(f => f.Image)
                 .Include(p => p.Category)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public bool Exists(int id)
+        public override async Task Update(Product product)
         {
-            return (_context.Products?.Any(p => p.Id == id)).GetValueOrDefault();
-        }
-
-        public async Task Update(Product product)
-        {
-            var existing = await _dbSet.Where(x => x.Id == product.Id).FirstOrDefaultAsync();
+            var existing = await _dbSet.FirstOrDefaultAsync(p => p.Id == product.Id);
 
             if (existing is not null)
             {
@@ -51,9 +48,14 @@ namespace Foody.Data.Repositories
                 existing.Price = product.Price;
                 existing.Quantity = product.Quantity;
                 existing.CategoryId = product.CategoryId;
-                existing.ImageUri = product.ImageUri;
-                existing.ImageData = product.ImageData;
                 existing.Description = product.Description;
+
+                if (product.Image is not null)
+                {
+                    existing.Image = product.Image;
+                    existing.ImageUri = product.ImageUri;
+                }
+
                 existing.Updated = DateTime.UtcNow;
             }
         }
