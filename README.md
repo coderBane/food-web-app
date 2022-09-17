@@ -1,8 +1,9 @@
-# Food Ordering Website ASP.NET Core .NET MAUI
+# Food Ordering Service ASP.NET Core .NET MAUI
 
 This repository contains an **ASP.NET Core WebAPI application** that implements **JWT Authentication**, a **.NET MAUI application** for administrative frontend that consumes the protected WebAPI.
 
 ### Project structure
+```
 repository
 |__src
 |    |__Foody -> web api project
@@ -10,6 +11,7 @@ repository
 |    |__.gitignore
 |__.gitignore
 |__ReadME.md
+```
 
 ## Getting Started
 Some requirement and workloads to install:
@@ -55,7 +57,59 @@ Create the database
 ```
 CREATE DATABASE foody;
 ```
-`Extra: You can run the command \l to view all existing databases`
+`NOTE: You can run the command \l to view all existing databases`
 
-### 
+### Configure the WebAPI
+
+Before we can run the project we need to configure a few things for the web api.
+Open the Foody.WebApi.csproj file and delete the UserSecretsId property.
+
+#### User-Secrets
+Run the command:
+```
+dotnet user-secrets init
+```
+Generate a random string using this website [random](https://www.random.org/strings/)
+Create a new file 's.json' and populate it with the following
+```
+{
+    "JwtConfig": {
+        "Secret": "<generatedstring>",
+        "ExpiryTimeFrame": "00:01:00"
+    },
+    "WatchDog": {
+        "Username": "<yourusername>",
+        "Password": "<yourpassword>"
+    },
+    "Postgres": "Server=localhost:55000;Database=foody;User Id=devuser;Password=<devuserpassword>;Integrated Security=true;Pooling=true;",
+    "UserPW": "<yourpassword>"
+}
+```
+Set the user secrets 
+```
+cat ./s.json | dotnet user-secrets set
+```
+`NOTE: You can delete the s.json file`
+
+#### Apply Database Migrations
+We need to create the tables in the database.
+```
+dotnet ef --startup-project ../Foody.WebApi database update
+```
+
+## Run the Projects
+
+We can now run the projects
+
+### ASP.NET Core WebAPI
+launch without swagger
+```
+dotnet run 
+```
+launch with swagger UI
+```
+dotnet watch
+```
+
+### .NET MAUI
 
