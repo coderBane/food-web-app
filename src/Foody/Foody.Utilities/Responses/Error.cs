@@ -2,7 +2,7 @@
 
 namespace Foody.Utilities.Responses;
 
-public class Error
+public sealed class Error
 {
     /// <summary>Status Code</summary>
     public int Code { get; set; }

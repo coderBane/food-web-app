@@ -45,7 +45,7 @@ namespace Foody.WebApi.Controllers.v1
             try
             {
                 var product = _mapper.Map<Product>(productModDto);
-                await Upload(product, productModDto.ImageUpload);
+                //await Upload(product, productModDto.ImageUpload);
 
                 ModelState.ClearValidationState(nameof(productModDto));
                 if (!TryValidateModel(product))
@@ -73,7 +73,7 @@ namespace Foody.WebApi.Controllers.v1
             try
             {
                 _mapper.Map(productModDto, product);
-                await Upload(product, productModDto.ImageUpload);
+                //await Upload(product, productModDto.ImageUpload);
 
                 ModelState.ClearValidationState(nameof(productModDto));
                 if (!TryValidateModel(product))

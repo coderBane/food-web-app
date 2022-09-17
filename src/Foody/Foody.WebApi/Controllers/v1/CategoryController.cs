@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Foody.WebApi.Controllers.v1
 {
-    public class CategoryController : BaseController
+    public sealed class CategoryController : BaseController
     {
         public CategoryController(IUnitofWork unitofWork, IMapper mapper) : base(unitofWork, mapper)
         {
@@ -51,26 +51,51 @@ namespace Foody.WebApi.Controllers.v1
 
         // POST: v1/Category
         [HttpPost]
-        [ProducesResponseType(201, Type = typeof(CategoryDetailDto))]
+        [ProducesResponseType(201, Type = typeof(Result<CategoryDto>))]
         public async Task<IActionResult> Post([FromForm] CategoryModDto categoryModDto)
         {
-            var result = new Result<CategoryDetailDto>();
-            var category = _mapper.Map<Category>(categoryModDto);
-            await Upload(category, categoryModDto.ImageUpload);
+            var result = new Result<CategoryDto>();
 
-            ModelState.ClearValidationState(nameof(categoryModDto));
-            if (!TryValidateModel(category))
+            try
             {
-                return UnprocessableEntity(ModelState);
+                var category = _mapper.Map<Category>(categoryModDto);
+                await Upload(category, categoryModDto.ImageUpload);
+
+                ModelState.ClearValidationState(nameof(categoryModDto));
+                if (!TryValidateModel(category))
+                {
+                    result.Error = AddError(422,
+                        ErrorsMessage.Generic.ValidationError, string.Empty,
+                        ModelState);
+
+                    return UnprocessableEntity(result);
+                }
+
+                _unitofWork.Categories.Add(category);
+                await _unitofWork.CompleteAsync();
+
+                var _dto = _mapper.Map<CategoryDto>(category);
+                result.Content = _dto;
+
+                return CreatedAtAction(nameof(Get), new { id = category.Id }, result);
             }
+            catch (DbUpdateException) when (_unitofWork.Categories.Exists(categoryModDto.Name))
+            {
+                //WatchDog.WatchLogger.Log(ex.InnerException!.Message);
 
-            _unitofWork.Categories.Add(category);
-            await _unitofWork.CompleteAsync();
+                result.Error = AddError(409,
+                    ErrorsMessage.Generic.ValidationError,
+                    ErrorsMessage.Category.Exists);
 
-            var _dto = _mapper.Map<CategoryDetailDto>(category);
-            result.Content = _dto;
+                return Conflict(result);
+            }
+            catch (Exception) { /*WatchDog.WatchLogger.Log(ex.Message);*/ }
 
-            return CreatedAtAction(nameof(Get), new { id = category.Id}, result);
+            result.Error = AddError(400,
+                ErrorsMessage.Generic.BadRequest,
+                ErrorsMessage.Generic.UnknownError);
+
+            return BadRequest(result);
         }
 
         // PUT: v1/Category/5
@@ -78,7 +103,8 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(204)]
         public async Task<IActionResult> Put(int id, [FromForm] CategoryModDto categoryModDto)
         {
-            var result = new Result<Type>();
+            var result = new Result<dynamic>();
+
             var category = await _unitofWork.Categories.Get(id);
 
             if (category is null)
@@ -90,15 +116,24 @@ namespace Foody.WebApi.Controllers.v1
                 return NotFound(result);
             }
 
-            _mapper.Map(categoryModDto, category);
-            await Upload(category, categoryModDto.ImageUpload);
-
-            ModelState.ClearValidationState(nameof(categoryModDto));
             try
             {
-                if (!TryValidateModel(category))
-                    return UnprocessableEntity(ModelState);
+                _mapper.Map(categoryModDto, category);
+                await Upload(category, categoryModDto.ImageUpload);
 
+                ModelState.ClearValidationState(nameof(categoryModDto));
+                if (!TryValidateModel(category))
+                {
+                    result.Error = AddError(422,
+                        ErrorsMessage.Generic.ValidationError,
+                        string.Empty,
+                        ModelState);
+
+                    //WatchDog.WatchLogger.Log(result.Error.Title + " : " + result.Error.Message);
+
+                    return UnprocessableEntity(result);
+                }
+                    
                 await _unitofWork.Categories.Update(category);
                 await _unitofWork.CompleteAsync();
             }
@@ -110,6 +145,14 @@ namespace Foody.WebApi.Controllers.v1
 
                 return NotFound(result);
             }
+            catch(DbUpdateException) when (_unitofWork.Categories.Exists(categoryModDto.Name))
+            {
+                result.Error = AddError(409,
+                    ErrorsMessage.Generic.ValidationError,
+                    ErrorsMessage.Category.Exists);
+
+                return Conflict(result);
+            }
 
             return NoContent();
         }
@@ -119,7 +162,7 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(204)]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = new Result<Type>();
+            var result = new Result<dynamic>();
             try
             {
                 await _unitofWork.Categories.Delete(id);
@@ -127,6 +170,8 @@ namespace Foody.WebApi.Controllers.v1
             }
             catch (NullReferenceException)
             {
+                //WatchDog.WatchLogger.Log(ex.Message);
+
                 result.Error = AddError(404,
                     ErrorsMessage.Generic.NotFound,
                     ErrorsMessage.Category.NotExist);

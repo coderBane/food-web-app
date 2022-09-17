@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Data.SqlClient;
 
 using Foody.Data.Data;
 using Foody.Data.Interfaces;
@@ -10,16 +11,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+using WatchDog;
+
 var builder = WebApplication.CreateBuilder(args);
 
-//Add services to the container.
+/***Add services to the container.**/
 
 //Update JWT class
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
 //Add DbContext DI
-builder.Services.AddDbContext<FoodyDbContext>(option =>
-    option.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+//builder.Services.AddDbContext<FoodyDbContext>(option =>
+//    option.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+
+var foodydb = new StringBuilder(builder.Configuration.GetConnectionString("foody"));
+foodydb.Append($"User Id={builder.Configuration["Postgres:User"]};");
+foodydb.Append($"Password={builder.Configuration["Postgres:Password"]};");
+foodydb.Append($"Integrated Security=true;Pooling=true;");
+
+builder.Services.AddDbContext<FoodyDbContext>(options =>
+options.UseNpgsql(foodydb.ToString())
+       .UseSnakeCaseNamingConvention());
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<FoodyDbContext>();
@@ -66,18 +78,26 @@ builder.Services.AddAuthentication(options =>
     jwt.TokenValidationParameters = tokenValidationParams;
 });
 
+// WatchDog DI
+//builder.Services.AddWatchDogServices(options =>
+//{
+//    options.IsAutoClear = false;
+//    options.SetExternalDbConnString = foodydb.ToString();
+//    options.SqlDriverOption = WatchDog.src.Enums.WatchDogSqlDriverEnum.PostgreSql;
+//});
+
 // AutoMapper DI
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
 /*** Initialize Database ***/
-using(var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    using var content = services.GetRequiredService<FoodyDbContext>();
-    DbInitialize.Initialize(content);
+    var password = builder.Configuration.GetValue<string>("UserPW");
+    await DbInitialize.InitializeAsync(services, password);
 }
 /****************************/
 
@@ -91,11 +111,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseDefaultFiles();
 app.UseStaticFiles();
+
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// watchdog middleware
+//app.UseWatchDogExceptionLogger();
+//app.UseWatchDog(opt =>
+//{
+//    opt.WatchPageUsername = builder.Configuration["WatchDog:Username"] ;
+//    opt.WatchPagePassword = builder.Configuration["WatchDog:Password"];
+//});
 
 app.Run();

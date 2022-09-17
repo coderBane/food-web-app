@@ -1,6 +1,6 @@
 ﻿namespace Foody.Entities.Models;
 
-public class Product : Item
+public sealed class Product : Item
 {
     [Required]
     public int CategoryId { get; set; }
@@ -16,3 +16,4 @@ public class Product : Item
 
     public Category Category { get; set; } = null!;
 }
+

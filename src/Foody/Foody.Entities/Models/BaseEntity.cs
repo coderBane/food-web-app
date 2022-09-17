@@ -7,11 +7,11 @@ public abstract class BaseEntity
     public int Id { get; set; }
 
     [ScaffoldColumn(false)]
-    public int Status { get; set; } = 1;
+    public int State { get; set; } = 1;
 
     [ScaffoldColumn(false)]
     public DateTime AddedOn { get; set; } = DateTime.UtcNow;
 
     [ScaffoldColumn(false)]
-    public DateTime Updated { get; set; }
+    public DateTime Updated { get; set; } 
 }

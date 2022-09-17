@@ -2,7 +2,7 @@
 
 namespace Foody.Utilities.Responses;
 
-public class Pagination<T> : Result<IEnumerable<T>>
+public sealed class Pagination<T> : Result<IEnumerable<T>>
 {
     public Pagination(IEnumerable<T>? content)
     {
