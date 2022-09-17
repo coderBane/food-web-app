@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Data.SqlClient;
 
 using Foody.Data.Data;
 using Foody.Data.Interfaces;
@@ -11,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-using WatchDog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,13 +22,8 @@ builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfi
 //builder.Services.AddDbContext<FoodyDbContext>(option =>
 //    option.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
-var foodydb = new StringBuilder(builder.Configuration.GetConnectionString("foody"));
-foodydb.Append($"User Id={builder.Configuration["Postgres:User"]};");
-foodydb.Append($"Password={builder.Configuration["Postgres:Password"]};");
-foodydb.Append($"Integrated Security=true;Pooling=true;");
-
 builder.Services.AddDbContext<FoodyDbContext>(options =>
-options.UseNpgsql(foodydb.ToString())
+options.UseNpgsql(builder.Configuration.GetValue<string>("Postgres"))
        .UseSnakeCaseNamingConvention());
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
