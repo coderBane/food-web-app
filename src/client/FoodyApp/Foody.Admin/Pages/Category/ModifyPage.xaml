@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Foody.Admin.Pages.Category.ModifyPage"
+             BackgroundColor="WhiteSmoke"
+             Title="ModifyPage">
+
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="Medium"/>
+            <Setter Property="TextColor" Value="Black"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Margin="50,50">
+
+            <Label Text="POPLLKL" FontSize="Subtitle"/>
+
+            <Line HeightRequest="2" BackgroundColor="LightGray"/>
+
+            <Grid RowDefinitions="*,Auto" ColumnDefinitions="*,*">
+
+                <TableView Intent="Form" Grid.ColumnSpan="2">
+                    <TableRoot>
+                        <TableSection Title="Category Info">
+                            <EntryCell Label="Name" Text="" Placeholder="Enter name here"/>
+                            <SwitchCell Text="Active" On="False"/>
+                            <ViewCell>
+                                <HorizontalStackLayout HorizontalOptions="FillAndExpand">
+                                    <Entry Placeholder="Image file" IsReadOnly="True" HorizontalOptions="StartAndExpand"/>
+                                    <Button Text="Upload" HorizontalOptions="EndAndExpand"/>
+                                </HorizontalStackLayout>
+                            </ViewCell>
+                        </TableSection>
+                    </TableRoot>
+                </TableView>
+
+                <Button Grid.Row="1" Text="Save"/>
+
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
