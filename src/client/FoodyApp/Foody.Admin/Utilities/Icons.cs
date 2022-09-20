@@ -11,6 +11,7 @@ public static class Icons
     public const string User = "account_user.png";
     public const string Dashboard = "dashboard.png";
     public const string Categories = "categories.png";
+    public const string LogoutWht = "logout_white.png";
     public const string ArrowDownBlk = "arrow_down_black.png";
 }
 
