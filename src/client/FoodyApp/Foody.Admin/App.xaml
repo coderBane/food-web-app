@@ -1,6 +1,7 @@
 ﻿<?xml version = "1.0" encoding = "UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:convert="clr-namespace:Foody.Admin.Utilities"
              xmlns:local="clr-namespace:Foody.Admin"
              x:Class="Foody.Admin.App">
     <Application.Resources>
@@ -9,6 +10,7 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <convert:Base64ImageConverter x:Key="Base64ImageConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
