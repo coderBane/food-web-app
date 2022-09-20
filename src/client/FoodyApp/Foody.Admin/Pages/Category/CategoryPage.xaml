@@ -28,7 +28,7 @@
             </Grid.RowDefinitions>
 
             <HorizontalStackLayout Spacing="20" VerticalOptions="StartAndExpand">
-                <Button Text="Create" WidthRequest="80"/>
+                <Button Text="Create" WidthRequest="80" Clicked="Create_Button"/>
                 <ImageButton Source="{x:Static icons:Icons.Refresh}"
                              IsEnabled="{Binding IsNotBusy}"
                              Command="{Binding CategoryListCommand}"/>
@@ -45,9 +45,9 @@
                         <Grid>
                             <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="0">
                                 <Grid ColumnDefinitions="*,*,*">    
-                                    <Label Grid.Column="0" Text="ID" BackgroundColor="Aquamarine"/>
-                                    <Label Grid.Column="1" Text="Name" BackgroundColor="Bisque"/>
-                                    <Label Grid.Column="2" Text="Status" BackgroundColor="BlueViolet"/>
+                                    <Label Grid.Column="0" Text="ID"/>
+                                    <Label Grid.Column="1" Text="Name"/>
+                                    <Label Grid.Column="2" Text="Status"/>
                                 </Grid>
                             </Frame>
                         </Grid>
@@ -60,7 +60,7 @@
                                 <Frame.GestureRecognizers>
                                     <TapGestureRecognizer
                                         CommandParameter="{Binding .}"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:CategoryVM}}, Path=GetCategoryCommand}"/>
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:CategoryVM}}, Path=TappedCommand}"/>
                                 </Frame.GestureRecognizers>
 
                                 <Grid ColumnDefinitions="*,*,*">

@@ -1,4 +1,5 @@
 ﻿using Foody.Admin.Authentication.Models;
+using Image = Microsoft.Maui.Controls.Image;
 
 namespace Foody.Admin.Pages;
 

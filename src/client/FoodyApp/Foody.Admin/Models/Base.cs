@@ -2,7 +2,7 @@
 
 namespace Foody.Admin.Models;
 
-public class Base
+public abstract class Base
 {
     private readonly JsonSerializerOptions _options;
 

@@ -21,10 +21,10 @@
             <BoxView Color="White" WidthRequest="195" HeightRequest="65"></BoxView>
 
             <Label Text="Welcome back, Boss" FontSize="Subtitle" FontAttributes="Bold"
-                  VerticalTextAlignment="Center"/>
+                  VerticalTextAlignment="Center" TextColor="White"/>
         </HorizontalStackLayout>
 
-        <Label Grid.Column="1" Text="Friday, 12 April 2021" FontSize="Subtitle" FontAttributes="Bold"
+        <Label Grid.Column="1" Text="Friday, 12 April 2021" TextColor="White" FontSize="Subtitle" FontAttributes="Bold"
                        VerticalTextAlignment="Center" HorizontalOptions="End"/>
 
 
