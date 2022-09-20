@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-
-namespace Foody.Admin.Rest.Services;
+﻿namespace Foody.Admin.Rest.Services;
 
 public class RestService<T> : IRestService<T> where T : class
 {
@@ -17,7 +15,7 @@ public class RestService<T> : IRestService<T> where T : class
 
     public async Task<PagedResult<T>> AllAsync(string search)
     {
-        if (result is not null) return result;
+        //if (result is not null) return result;
 
         this.url += !string.IsNullOrEmpty(search) ? $"?search={search}" : default;
 
@@ -57,14 +55,42 @@ public class RestService<T> : IRestService<T> where T : class
         return single;
     }
 
-    public Task<Result<dynamic>> SaveDataAsync(T entity, bool isNew = false)
+    public async Task<Result<dynamic>> SaveDataAsync(dynamic entity, bool isNew = false)
     {
-        throw new NotImplementedException();
+        try
+        {
+            string json = entity.ToString();
+            var content = new StringContent(json, Encoding.UTF8, "multipart/form-data");
+
+            var response = isNew ? await _client.PostAsync(url, content) :
+                               await _client.PutAsync($"{url}", content);
+
+            response.EnsureSuccessStatusCode();
+            single = await response.Content.ReadFromJsonAsync<Result<dynamic>>();
+
+            if (!single.Success)
+                Debug.WriteLine($"{result.Error.Title} : {result.Error.Message}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+
+        return single;
     }
 
-    public Task<Result<T>> DeleteAsync(int id)
+    public async Task<Result<dynamic>> DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        var response = await _client.DeleteAsync($"{url}/{id}");
+        response.EnsureSuccessStatusCode();
+        single = response.StatusCode is System.Net.HttpStatusCode.NoContent ? null :
+            await response.Content.ReadFromJsonAsync<Result<dynamic>>();
+
+        if (single is not null)
+            if (!single.Success)
+                Debug.WriteLine($"{result.Error.Title} : {result.Error.Message}");
+        
+        return single;
     }
 }
 

@@ -6,8 +6,8 @@ public interface IRestService<T> where T : class
 
     Task<Result<dynamic>> GetAsync(int id);
 
-    Task<Result<dynamic>> SaveDataAsync(T entity, bool isNew = false);
+    Task<Result<dynamic>> SaveDataAsync(dynamic entity, bool isNew = false);
 
-    Task<Result<T>> DeleteAsync(int id);
+    Task<Result<dynamic>> DeleteAsync(int id);
 }
 
