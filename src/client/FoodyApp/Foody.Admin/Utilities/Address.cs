@@ -4,7 +4,8 @@ public static class Address
 {
     public static class Base
     {
-        public const string BaseAddress = "https://localhost:7157";
+        public static string BaseAddress = DeviceInfo.Platform == DevicePlatform.Android ?
+            "https://10.0.2.2:7157" : "https://localhost:7157";
     }
 
     public static class Account

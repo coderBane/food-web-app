@@ -24,6 +24,9 @@ public partial class BaseViewModel : ObservableObject
 
     public bool IsNotBusy => !IsBusy;
 
+    [ICommand]
+    internal async Task GoBack() => await Shell.Current.GoToAsync("..", true);
+
     internal static T ToObject<T>(JsonElement element)
     {
         return JsonSerializer.Deserialize<T>(element, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
