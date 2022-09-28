@@ -1,5 +1,4 @@
-﻿using Foody.Admin.Pages.Category;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 
 namespace Foody.Admin.ViewModels.Category;
@@ -11,14 +10,16 @@ public partial class CategoryVM : BaseViewModel
         this.Title = nameof(Category);
 
         MessagingCenter.Subscribe<CategoryVM>(this, "refresh", async (sender) => await CategoryList());
+        MessagingCenter.Subscribe<CatogoryModifyVM>(this, "refresh", async (sender) =>
+        {
+            await CategoryList();
+            await GoBack();
+        });
 
         Task.Run(CategoryList);
     }
 
     #region Properties
-    [ObservableProperty]
-    bool isnew;
-
     [ObservableProperty]
     Models.Category selectedCategory; 
 
@@ -69,16 +70,16 @@ public partial class CategoryVM : BaseViewModel
 
         switch (action)
         {
-            case "Edit": break;
+            case "Edit": await Get(0x65) ; break;
             case "Delete": await Delete(); break;
-            case "View": await Get(); break;
+            case "View": await Get(0x76); break;
             default: break;
         }
     }
     #endregion
 
     #region Actions
-    async Task Get()
+    async Task Get(int command)
     {
         if (SelectedCategory is null) return;
 
@@ -91,10 +92,23 @@ public partial class CategoryVM : BaseViewModel
 
             var navigationParameter = new Dictionary<string, object>()
             {
-                ["category"] = ToObject<CategoryDetail>(result.Content)
+                ["Category"] = result.Content,
+                ["IsNew"] = false
             };
 
-            await Shell.Current.GoToAsync("categorydeet", true, navigationParameter);
+            switch (command)    
+            {
+                case 0x65:
+                    await Shell.Current.GoToAsync("categorymod",true, navigationParameter);
+                    break;
+
+                case 0x76:
+                    await Shell.Current.GoToAsync("categorydeet", true, navigationParameter);
+                    break;
+
+                default:
+                    break;
+            }
 
             MainThread.BeginInvokeOnMainThread(() => SelectedCategory = null);
         }
@@ -110,7 +124,7 @@ public partial class CategoryVM : BaseViewModel
         if (SelectedCategory is null) return;
 
         bool answer = await Shell.Current.DisplayAlert("Confirm",
-           $"Are you sure yo wnat to delete '{SelectedCategory.Name}'", "Yes", "Cancel");
+           $"Are you sure you want to delete '{SelectedCategory.Name}'", "Yes", "Cancel");
 
         if (!answer) return;
 

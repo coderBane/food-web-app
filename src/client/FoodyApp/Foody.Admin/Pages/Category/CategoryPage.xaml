@@ -4,13 +4,18 @@
              xmlns:model="clr-namespace:Foody.Admin.Models"
              xmlns:viewmodel="clr-namespace:Foody.Admin.ViewModels.Category"
              xmlns:control="clr-namespace:Foody.Admin.Control"
-             xmlns:icons="clr-namespace:Foody.Admin.Utilities"
+             xmlns:ext="clr-namespace:Foody.Admin.Utilities"
              x:DataType="viewmodel:CategoryVM"
              x:Class="Foody.Admin.Pages.Category.CategoryPage"
              BackgroundColor="WhiteSmoke"
              Title="{Binding Title}">
 
     <ContentPage.Resources>
+        <ResourceDictionary>
+            <ext:BoolObjectConverter x:Key="BoolToColor"  TrueObject="Green" FalseObject="Red"/>
+            <ext:BoolObjectConverter x:Key="BoolToText" TrueObject="Active" FalseObject="Inactive"/>
+        </ResourceDictionary>
+
         <Style TargetType="Label">
             <Setter Property="TextColor" Value="Black"/>
             <Setter Property="FontSize" Value="Medium"/>
@@ -29,7 +34,7 @@
 
             <HorizontalStackLayout Spacing="20" VerticalOptions="StartAndExpand">
                 <Button Text="Create" WidthRequest="80" Clicked="Create_Button"/>
-                <ImageButton Source="{x:Static icons:Icons.Refresh}"
+                <ImageButton Source="{x:Static ext:Icons.Refresh}"
                              IsEnabled="{Binding IsNotBusy}"
                              Command="{Binding CategoryListCommand}"/>
             </HorizontalStackLayout>
@@ -42,7 +47,7 @@
                                 SelectionMode="None"
                                 EmptyView="No data...">
                     <CollectionView.Header>
-                        <Grid>
+                        <Grid HorizontalOptions="Fill">
                             <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="0">
                                 <Grid ColumnDefinitions="*,*,*">    
                                     <Label Grid.Column="0" Text="ID"/>
@@ -65,8 +70,11 @@
 
                                 <Grid ColumnDefinitions="*,*,*">
                                     <Label Grid.Column="0" Text="{Binding Id}"/>
-                                    <Label Grid.Column="1" Text="{Binding Name}" Padding="10,0"/>
-                                    <Label Grid.Column="2" Text="{Binding IsActive}" Padding="20,0"/>
+                                    <Label Grid.Column="1" Text="{Binding Name}"/>
+                                    <BoxView Grid.Column="2" HeightRequest="20" WidthRequest="40"
+                                             BackgroundColor="{Binding IsActive, Converter={StaticResource BoolToColor}}"/>
+                                    <Label Grid.Column="2"
+                                           Text="{Binding IsActive, Converter={StaticResource BoolToText}}"/>
                                 </Grid>
                             </Frame>
                            
