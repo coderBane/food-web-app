@@ -9,8 +9,10 @@ public static class Icons
     public const string Refresh = "refresh.png";
     public const string Language = "language.png";
     public const string User = "account_user.png";
+    public const string NoImage = "no_image.jpeg";
     public const string Dashboard = "dashboard.png";
     public const string Categories = "categories.png";
+    public const string LogoutWht = "logout_white.png";
     public const string ArrowDownBlk = "arrow_down_black.png";
 }
 

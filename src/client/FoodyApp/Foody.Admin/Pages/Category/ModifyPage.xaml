@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:Foody.Admin.ViewModels.Category"
+             xmlns:icons="clr-namespace:Foody.Admin.Utilities"
+             x:DataType="viewmodel:CatogoryModifyVM"
+             x:Class="Foody.Admin.Pages.Category.ModifyPage"
+             BackgroundColor="WhiteSmoke"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="Medium"/>
+            <Setter Property="TextColor" Value="Black"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Margin="50,50">
+
+            <Label Text="{Binding Category.Name, StringFormat='Modify: {0}'}" FontSize="Subtitle"/>
+
+            <Line HeightRequest="2" BackgroundColor="LightGray"/>
+
+            <Grid RowDefinitions="*,Auto,Auto" ColumnDefinitions="*,*,*" RowSpacing="30">
+
+                <TableView Intent="Form" Grid.ColumnSpan="3">
+                    <TableRoot>
+                        <TableSection Title="Category Info">
+                            <EntryCell Label="Name" Text="{Binding Category.Name}" Placeholder="Enter name here"/>
+                            <SwitchCell Text="Active" On="{Binding Category.IsActive}"/>
+                            <ViewCell>
+                                <Grid ColumnDefinitions="*,*" Padding="10,0">
+                                    <Entry Text="{Binding Category.ImageUri}" Placeholder="Image File" IsReadOnly="True" x:Name="iname"/>
+                                    <Button Grid.Column="1" Text="Upload"
+                                            Clicked="Upload_Clicked"/>
+                                </Grid>
+                            </ViewCell>
+                        </TableSection>
+                    </TableRoot>
+                </TableView>
+
+                <Button Grid.Row="1" Text="Save" Command="{Binding SaveCommand}"/>
+                <Button Grid.Row="1" Grid.Column="1" Text="Cancel" Command="{Binding GoBackCommand}"/>
+
+                <Frame Grid.Row="2" Grid.Column="1" IsClippedToBounds="True"
+                       WidthRequest="400" HeightRequest="400">
+                    <Image Aspect="AspectFill" HorizontalOptions="Center" VerticalOptions="Center"
+                           HeightRequest="390" WidthRequest="390"
+                           Source="{Binding Category.Image.Content, Converter={StaticResource Base64ImageConverter}, FallbackValue={Static icons:Icons.NoImage}}"
+                           x:Name="image" />
+                </Frame>
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

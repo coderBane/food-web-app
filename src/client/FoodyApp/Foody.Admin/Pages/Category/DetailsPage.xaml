@@ -38,14 +38,15 @@
 
                 <Frame BackgroundColor="White" HeightRequest="400" WidthRequest="400"
                        IsClippedToBounds="True">
-                    <Image Aspect="AspectFit" HeightRequest="390" WidthRequest="390"
+                    <Image Aspect="AspectFill" HeightRequest="390" WidthRequest="390"
                            HorizontalOptions="Center" VerticalOptions="Center"
-                           Source="{Binding Category.ImageUri}"/>
+                           Source="{Binding Category.Image.Content, Mode=OneWay, Converter={x:StaticResource Base64ImageConverter}}"/>
                 </Frame>
 
                <VerticalStackLayout Grid.Column="1" Spacing="10" Padding="10">
                     <Label Text="{Binding Category.Name, StringFormat='Name: {0}'}"/>
                     <Label Text="{Binding Category.IsActive, StringFormat='Status: {0}'}"/>
+                    <Label Text="{Binding Category.ImageUri, StringFormat='Image: {0}'}"/>
                     <Label Text="{Binding Category.AddedOn, StringFormat='Created: {0}'}"/>
                     <Label Text="{Binding Category.Updated, StringFormat='Updated: {0}'}"/>
                </VerticalStackLayout>

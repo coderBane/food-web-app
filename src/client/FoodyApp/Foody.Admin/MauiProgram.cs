@@ -3,6 +3,7 @@ using Foody.Admin.ViewModels.Category;
 using Foody.Admin.Authentication.Services;
 using Foody.Admin.Authentication.Interfaces;
 
+using System.Net.Http;
 
 namespace Foody.Admin;
 
@@ -28,10 +29,12 @@ public static class MauiProgram
 		//ViewModels
 		builder.Services.AddSingleton<CategoryVM>();
 		builder.Services.AddTransient<CategoryDetailsVM>();
+		builder.Services.AddTransient<CatogoryModifyVM>();
 
 		//Pages
 		builder.Services.AddSingleton<Pages.Category.CategoryPage>();
 		builder.Services.AddTransient<Pages.Category.DetailsPage>();
+		builder.Services.AddTransient<Pages.Category.ModifyPage>();
 
 		return builder.Build();
 	}

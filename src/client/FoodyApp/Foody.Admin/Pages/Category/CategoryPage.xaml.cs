@@ -10,4 +10,14 @@ public partial class CategoryPage : ContentPage
 
 		BindingContext = category;
 	}
+
+    async void Create_Button(Object sender, EventArgs e)
+    {
+		await Shell.Current.GoToAsync("categorymod", true,
+			new Dictionary<string, object>()
+            {
+                ["Category"] = new Models.Category(),
+                ["IsNew"] = true
+            });
+    }
 }

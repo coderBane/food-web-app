@@ -2,6 +2,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:icons="clr-namespace:Foody.Admin.Utilities"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              x:Class="Foody.Admin.Control.TopGridView">
 
     <Grid HeightRequest="260" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="40">
@@ -21,11 +22,17 @@
             <BoxView Color="White" WidthRequest="195" HeightRequest="65"></BoxView>
 
             <Label Text="Welcome back, Boss" FontSize="Subtitle" FontAttributes="Bold"
-                  VerticalTextAlignment="Center"/>
+                  VerticalTextAlignment="Center" TextColor="White"/>
         </HorizontalStackLayout>
 
-        <Label Grid.Column="1" Text="Friday, 12 April 2021" FontSize="Subtitle" FontAttributes="Bold"
-                       VerticalTextAlignment="Center" HorizontalOptions="End"/>
+        <Label BindingContext="{Static sys:DateTime.UtcNow}" Grid.Column="1" FontSize="Subtitle" FontAttributes="Bold"
+                       VerticalTextAlignment="Center" HorizontalOptions="End">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="{Binding StringFormat='{0:D}'}" TextColor="White"/>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
 
 
         <Frame Grid.Row="1" Grid.ColumnSpan="2" HeightRequest="70" BackgroundColor="WhiteSmoke"

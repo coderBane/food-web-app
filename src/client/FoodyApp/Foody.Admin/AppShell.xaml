@@ -7,11 +7,22 @@
     xmlns:pages="clr-namespace:Foody.Admin.Pages"
     xmlns:icons="clr-namespace:Foody.Admin.Utilities"
     Shell.TabBarIsVisible="False"
-    Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
+    Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}"
+    Shell.FlyoutItemIsVisible="{OnIdiom Desktop=False, Default=True}"
+    FlyoutBackgroundColor="#323232">
+
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid Margin="10,5" ColumnDefinitions="0.2*,0.8*" RowSpacing="20">
+                <Image Source="{Binding FlyoutIcon}" HeightRequest="40"/>
+                <Label Grid.Column="1" Text="{Binding Title}" FontAttributes="Bold"
+                       FontSize="Medium" VerticalTextAlignment="Center"/>
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
 
     <Shell.FlyoutHeader>
-        <Grid HeightRequest="15">
-            <Label Text="Navigation"/>
+        <Grid HeightRequest="30">
         </Grid>
     </Shell.FlyoutHeader>
 
@@ -27,10 +38,15 @@
 
     </FlyoutItem>
     <FlyoutItem Title="Items" Icon="{x:Static icons:Icons.Items}">
-        <ShellContent Title="Category" Icon="{x:Static icons:Icons.Categories}"
+        <ShellContent
+            Title="Category" Icon="{x:Static icons:Icons.Categories}"
             ContentTemplate="{DataTemplate pages:Category.CategoryPage}"/>
 
     </FlyoutItem>
+
+    <MenuItem Text="Log Out"
+              IconImageSource="{x:Static icons:Icons.LogoutWht}"
+              Clicked="logout_Clicked"/>
 
 </Shell>
 

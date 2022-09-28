@@ -1,6 +1,6 @@
 ﻿namespace Foody.Admin.ViewModels.Category;
 
-[QueryProperty("Category","category")]
+[QueryProperty("Category","Category")]
 public partial class CategoryDetailsVM : BaseViewModel
 {
     public CategoryDetailsVM(IDataManager dataManager) : base(dataManager)
@@ -9,9 +9,6 @@ public partial class CategoryDetailsVM : BaseViewModel
     }
 
     [ObservableProperty]
-    CategoryDetail category;
-
-    [ICommand]
-    async void GoBack() => await Shell.Current.GoToAsync("..", true);
+    Models.Category category;
 }
 
