@@ -18,6 +18,7 @@ namespace Foody.Test
                 cfg.AddProfiles(new List<Profile>
                 {
                     new ItemProfile(),
+                    new CommunicationProfile(),
                 });
             });
             mapper = config.CreateMapper();
