@@ -18,5 +18,10 @@ public static class ErrorsMessage
         public const string NotExist = "Category does not exist";
         public const string Exists = "Category with given name already in database";
     }
+
+    public static class Newsletter
+    {
+        public const string NotExist = "Email is not part of subscribtion list";
+    }
 }
 
