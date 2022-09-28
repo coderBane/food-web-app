@@ -1,29 +1,53 @@
-﻿namespace Foody.Admin.Rest.Services;
+﻿using System.Net.Http.Headers;
+
+
+namespace Foody.Admin.Rest.Services;
 
 public class RestService<T> : IRestService<T> where T : class
 {
-    readonly HttpClient _client = new();
     protected string url;
+    protected readonly HttpClient _client = new();
 
-    PagedResult<T> result;
-    Result<dynamic> single;
+    PagedResult<T> pagedResult;
+    Result<T> result;
+    internal Result<dynamic> single;
 
     public RestService()
     {
         _client.BaseAddress = new Uri(Address.Base.BaseAddress);
+        //_client.DefaultRequestHeaders.Accept.Add(
+        //    MediaTypeWithQualityHeaderValue.Parse("application/json"));
+            
     }
 
     public async Task<PagedResult<T>> AllAsync(string search)
     {
-        //if (result is not null) return result;
-
         this.url += !string.IsNullOrEmpty(search) ? $"?search={search}" : default;
 
         try
         {
             var response = await _client.GetAsync(url);
             response.EnsureSuccessStatusCode();
-            result = await response.Content.ReadFromJsonAsync<PagedResult<T>>();
+            pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<T>>();
+
+            if (!pagedResult.Success)
+                Debug.WriteLine($"{pagedResult.Error.Title} : {pagedResult.Error.Message}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+
+        return pagedResult;
+    }
+
+    public async Task<Result<T>> GetAsync(int id)
+    {
+        try
+        {
+            var response = await _client.GetAsync($"{url}/{id}");
+            response.EnsureSuccessStatusCode();
+            result = await response.Content.ReadFromJsonAsync<Result<T>>();
 
             if (!result.Success)
                 Debug.WriteLine($"{result.Error.Title} : {result.Error.Message}");
@@ -36,31 +60,13 @@ public class RestService<T> : IRestService<T> where T : class
         return result;
     }
 
-    public async Task<Result<dynamic>> GetAsync(int id)
-    {
-        try
-        {
-            var response = await _client.GetAsync($"{url}/{id}");
-            response.EnsureSuccessStatusCode();
-            single = await response.Content.ReadFromJsonAsync<Result<dynamic>>();
-
-            if (!single.Success)
-                Debug.WriteLine($"{result.Error.Title} : {result.Error.Message}");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex.Message);
-        }
-
-        return single;
-    }
-
-    public async Task<Result<dynamic>> SaveDataAsync(dynamic entity, bool isNew = false)
+    public virtual async Task<Result<dynamic>> SaveDataAsync(T entity, bool isNew = false)
     {
         try
         {
             string json = entity.ToString();
-            var content = new StringContent(json, Encoding.UTF8, "multipart/form-data");
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = isNew ? await _client.PostAsync(url, content) :
                                await _client.PutAsync($"{url}", content);

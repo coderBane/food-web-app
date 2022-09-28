@@ -1,17 +1,21 @@
-﻿using System;
-
-namespace Foody.Admin.Models;
+﻿namespace Foody.Admin.Models;
 
 public abstract class Base
 {
-    private readonly JsonSerializerOptions _options;
+    internal JsonSerializerOptions _options;
+
+    public int Id { get; set; }
+
+    public DateTime AddedOn { get; set; }
+
+    public DateTime Updated { get; set; }
 
     public Base()
     {
         _options = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
+            WriteIndented = true,
         };
     }
     
