@@ -1,9 +1,10 @@
 ﻿using Foody.Entities.DTOs;
 using Foody.Entities.Models;
+using Foody.Utilities.Messages;
 using Foody.Utilities.Responses;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Foody.Test.Controllers
+namespace Foody.Test.Systems.Controllers
 {
     public class CategoryControllerTests : TestBase
     {
@@ -66,6 +67,7 @@ namespace Foody.Test.Controllers
             Assert.False(data.Success);
             Assert.Null(data.Content);
             Assert.NotNull(data.Error);
+            Assert.Contains(ErrorsMessage.Category.NotExist, data.Error.Message);
         }
 
         internal static IEnumerable<Category> GetCategories(int count) =>

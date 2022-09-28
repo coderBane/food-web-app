@@ -23,13 +23,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Controllers\" />
     <None Remove="FakeItEasy" />
-    <None Remove="AutoMapper\" />
+    <None Remove="Systems\" />
+    <None Remove="Systems\Controllers\" />
+    <None Remove="Systems\AutoMapper\" />
+    <None Remove="Fixtures\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="AutoMapper\" />
+    <Folder Include="Systems\" />
+    <Folder Include="Systems\Controllers\" />
+    <Folder Include="Systems\AutoMapper\" />
+    <Folder Include="Fixtures\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foody.WebApi\Foody.WebApi.csproj" />
