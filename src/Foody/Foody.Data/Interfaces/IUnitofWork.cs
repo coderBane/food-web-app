@@ -8,6 +8,10 @@ public interface IUnitofWork
 
     IRefreshTokenRepository RefreshToken { get; }
 
+    INewsletterRepository Subcribers { get; }
+
+    IContactRepository Contacts { get; }
+
     Task CompleteAsync();
 }
 

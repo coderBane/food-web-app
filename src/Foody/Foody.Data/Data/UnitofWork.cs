@@ -15,6 +15,8 @@ public class UnitofWork : IUnitofWork, IDisposable
         Categories = new CategoryRepository(_context);
         Products = new ProductRepository(_context);
         RefreshToken = new RefreshTokenRepository(_context);
+        Subcribers = new NewsletterRepository(_context);
+        Contacts = new ContactRepository(_context);
     }
 
     public ICategoryRepository Categories { get; private set; }
@@ -22,6 +24,10 @@ public class UnitofWork : IUnitofWork, IDisposable
     public IProductRepository Products { get; private set; }
 
     public IRefreshTokenRepository RefreshToken { get; private set; }
+
+    public INewsletterRepository Subcribers { get; private set; }
+
+    public IContactRepository Contacts { get; private set; }
 
     public async Task CompleteAsync()
     {
