@@ -24,7 +24,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<IEnumerable<T>> All(string search)
     {
-       return await _dbSet.ToListAsync();
+       return await _dbSet.AsNoTracking().ToListAsync();
     }
 
     public virtual async Task Delete(int id)
