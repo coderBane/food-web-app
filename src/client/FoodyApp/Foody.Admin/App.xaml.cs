@@ -12,7 +12,6 @@ public partial class App : Application
 		InitializeComponent();
 
 		Account = account;
-		//MainPage = new Pages.DashboardPage();
 		MainPage = new AppShell();
 	}
 
