@@ -20,32 +20,48 @@ namespace Foody.Data.Data
 
         public static void SeedData(FoodyDbContext context)
         {
-            if (context.Items.Any())
-                return;
-
-            new List<Category>()
+            if (!context.Items.Any())
             {
-                new() { Name = "Rice", IsActive = true },
-                new() { Name = "Protien" },
-                new() { Name = "Sides" },
-                new() { Name = "Drinks" },
-                new() { Name = "Food Tray" }
-            }.ForEach(x => context.Categories.Add(x));
+                new List<Category>()
+                {
+                    new() { Name = "Rice", IsActive = true },
+                    new() { Name = "Protien" },
+                    new() { Name = "Sides" },
+                    new() { Name = "Drinks" },
+                    new() { Name = "Food Tray" }
+                }.ForEach(x => context.Categories.Add(x));
 
-            context.SaveChanges();
+                    context.SaveChanges();
 
-            new List<Product>()
+                new List<Product>()
+                {
+                    new() { Name = "Jambalaya", CategoryId = 101, IsActive = true, Price = 3000, Description = Faker.Lorem.Sentence() },
+                    new() { Name = "Jollof Rice", CategoryId = 101, IsActive = true, Price = 1500, Description = "The Best party rice." },
+                    new() { Name = "Beef", CategoryId = 102, Price = 800 },
+                    new() { Name = "Chicken", CategoryId = 102, Price = 1000, Description = "Juicy lap" },
+                    new() { Name = "Asun", CategoryId = 103, IsActive = true, Price = 1500, Description = "Assorted meat (spicy)." },
+                    new() { Name = "puff puff", CategoryId = 103, IsActive = true, Price = 500, Description = "Sweet dough balls." },
+                    new() { Name = "Mango Juice", CategoryId = 104, Price = 1500},
+                    new() { Name = "Zobo", CategoryId = 104, IsActive = true, Price = 1000, Description = "Purple hibiscus drink" },
+
+                }.ForEach(x => context.Products.Add(x));
+            }
+
+            if (!context.Subcribers.Any())
             {
-                new() { Name = "Jambalaya", CategoryId = 101, IsActive = true, Price = 3000, Description = Faker.Lorem.Sentence() },
-                new() { Name = "Jollof Rice", CategoryId = 101, IsActive = true, Price = 1500, Description = "The Best party rice." },
-                new() { Name = "Beef", CategoryId = 102, Price = 800 },
-                new() { Name = "Chicken", CategoryId = 102, Price = 1000, Description = "Juicy lap" },
-                new() { Name = "Asun", CategoryId = 103, IsActive = true, Price = 1500, Description = "Assorted meat (spicy)." },
-                new() { Name = "puff puff", CategoryId = 103, IsActive = true, Price = 500, Description = "Sweet dough balls." },
-                new() { Name = "Mango Juice", CategoryId = 104, Price = 1500},
-                new() { Name = "Zobo", CategoryId = 104, IsActive = true, Price = 1000, Description = "Purple hibiscus drink" },
+                var subs = Enumerable.Range(0, 5).Select(_ =>
+                {
+                    var name = Faker.Name.First();
+                    return new Newsletter
+                    {
+                        Name = name,
+                        Email = Faker.Internet.Email(name)
+                    };
+                });
 
-            }.ForEach(x => context.Products.Add(x));
+                foreach (var sub in subs)
+                    context.Subcribers.Add(sub);
+            }
 
             context.SaveChanges();
         }

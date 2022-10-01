@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Foody.Data.Interfaces;
-using Foody.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -37,6 +36,24 @@ namespace Foody.WebApi.Controllers.v1
                 Title = title,
                 Message = error ?? message
             };
+        }
+
+        internal IActionResult? ValidateModel<T,D>(T entity, D dto)
+        {
+            var result = new Result<dynamic>();
+            ModelState.ClearValidationState(nameof(dto));
+
+            if (!TryValidateModel(entity!))
+            {
+                result.Error = AddError(422,
+                    ErrorsMessage.Generic.ValidationError,
+                    string.Empty,
+                    ModelState);
+
+                return UnprocessableEntity(result);
+            }
+
+            return null;
         }
 
         internal static async Task Upload<T>(T entity, IFormFile file) where T : Item

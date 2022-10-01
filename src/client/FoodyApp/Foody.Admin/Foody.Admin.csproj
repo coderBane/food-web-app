@@ -65,6 +65,9 @@
 	  <MauiXaml Update="Pages\Category\ModifyPage.xaml">
 	    <SubType></SubType>
 	  </MauiXaml>
+	  <MauiXaml Update="Control\TableView.xaml">
+	    <SubType></SubType>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

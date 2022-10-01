@@ -4,6 +4,7 @@
              xmlns:model="clr-namespace:Foody.Admin.Models"
              xmlns:viewmodel="clr-namespace:Foody.Admin.ViewModels.Category"
              xmlns:control="clr-namespace:Foody.Admin.Control"
+             xmlns:template="clr-namespace:Foody.Admin.Templates"
              xmlns:ext="clr-namespace:Foody.Admin.Utilities"
              x:DataType="viewmodel:CategoryVM"
              x:Class="Foody.Admin.Pages.Category.CategoryPage"
@@ -14,6 +15,9 @@
         <ResourceDictionary>
             <ext:BoolObjectConverter x:Key="BoolToColor"  TrueObject="Green" FalseObject="Red"/>
             <ext:BoolObjectConverter x:Key="BoolToText" TrueObject="Active" FalseObject="Inactive"/>
+            <DataTemplate x:Key="CategoryTemplate" x:DataType="model:Category">
+                <template:CatagoryTable/>
+            </DataTemplate>
         </ResourceDictionary>
 
         <Style TargetType="Label">
@@ -39,49 +43,10 @@
                              Command="{Binding CategoryListCommand}"/>
             </HorizontalStackLayout>
 
-            <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*"  ColumnDefinitions="*,*,*" Margin="0,20" RowSpacing="20">
-                <Entry Placeholder="Find..." TextColor="Black" Grid.Column="0"/>
-                <Line HeightRequest="1" BackgroundColor="LightGray" Grid.Row="1" Grid.ColumnSpan="3"/>
-              
-                <CollectionView ItemsSource="{Binding Categories}" Grid.Row="2" Grid.ColumnSpan="3"
-                                SelectionMode="None"
-                                EmptyView="No data...">
-                    <CollectionView.Header>
-                        <Grid HorizontalOptions="Fill">
-                            <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="0">
-                                <Grid ColumnDefinitions="*,*,*">    
-                                    <Label Grid.Column="0" Text="ID"/>
-                                    <Label Grid.Column="1" Text="Name"/>
-                                    <Label Grid.Column="2" Text="Status"/>
-                                </Grid>
-                            </Frame>
-                        </Grid>
-                    </CollectionView.Header>
-                        
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:Category">
-
-                            <Frame BackgroundColor="LightGrey" BorderColor="DarkGray" CornerRadius="0">
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                        CommandParameter="{Binding .}"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:CategoryVM}}, Path=TappedCommand}"/>
-                                </Frame.GestureRecognizers>
-
-                                <Grid ColumnDefinitions="*,*,*">
-                                    <Label Grid.Column="0" Text="{Binding Id}"/>
-                                    <Label Grid.Column="1" Text="{Binding Name}"/>
-                                    <BoxView Grid.Column="2" HeightRequest="20" WidthRequest="40"
-                                             BackgroundColor="{Binding IsActive, Converter={StaticResource BoolToColor}}"/>
-                                    <Label Grid.Column="2"
-                                           Text="{Binding IsActive, Converter={StaticResource BoolToText}}"/>
-                                </Grid>
-                            </Frame>
-                           
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Grid>
+            <control:TableView Grid.Row="1"
+                               Collection="{Binding Categories}"
+                               Template="{StaticResource CategoryTemplate}"
+                               ColumnNames="{Binding Columns}"/>
 
             <ActivityIndicator Grid.RowSpan="2"
                                IsVisible="{Binding IsBusy}"

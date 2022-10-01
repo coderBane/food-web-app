@@ -14,6 +14,8 @@ namespace Foody.Data.Data
         public DbSet<Item> Items => Set<Item>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Contact> Inquiries => Set<Contact>();
+        public DbSet<Newsletter> Subcribers => Set<Newsletter>();
         public virtual DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         public FoodyDbContext(DbContextOptions<FoodyDbContext> options) : base(options) { }
@@ -39,6 +41,9 @@ namespace Foody.Data.Data
                 b.HasComment("Table which implements table-per-heirachy inheritance (TPH)" + "\n" +
                     "Contains data for both Categories and Product.");
             });
+
+            modelBuilder.Entity<Newsletter>()
+                .HasComment("Newsletter subcribers.");
 
             modelBuilder.HasDefaultSchema("api");
         }
