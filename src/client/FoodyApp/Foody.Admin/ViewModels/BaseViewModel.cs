@@ -14,6 +14,9 @@ public partial class BaseViewModel : ObservableObject
     [ObservableProperty]
     string title;
 
+    [ObservableProperty]
+    string[] columns;
+
     protected readonly IDataManager dataManager;
     //protected readonly IConnectivity connectivity;
 

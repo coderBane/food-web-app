@@ -8,6 +8,7 @@ public partial class CategoryVM : BaseViewModel
     public CategoryVM(IDataManager dataManager) : base(dataManager)
     {
         this.Title = nameof(Category);
+        this.Columns = new[]{ "ID", "Name", "Status" };
 
         MessagingCenter.Subscribe<CategoryVM>(this, "refresh", async (sender) => await CategoryList());
         MessagingCenter.Subscribe<CatogoryModifyVM>(this, "refresh", async (sender) =>
