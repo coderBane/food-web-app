@@ -6,7 +6,7 @@ namespace Foody.Admin.Rest.Services;
 public class RestService<T> : IRestService<T> where T : class
 {
     protected string url;
-    protected readonly HttpClient _client = new();
+    protected readonly HttpClient _client;
 
     PagedResult<T> pagedResult;
     Result<T> result;
@@ -14,10 +14,14 @@ public class RestService<T> : IRestService<T> where T : class
 
     public RestService()
     {
-        _client.BaseAddress = new Uri(Address.Base.BaseAddress);
-        //_client.DefaultRequestHeaders.Accept.Add(
-        //    MediaTypeWithQualityHeaderValue.Parse("application/json"));
-            
+#if DEBUG
+        new HttpsClientHandlerService(out _client);
+        if (_client is null)
+            _client = new();
+#else
+        _client = new();
+#endif
+        _client.BaseAddress = new Uri(Address.Base.BaseAddress); 
     }
 
     public async Task<PagedResult<T>> AllAsync(string search)
