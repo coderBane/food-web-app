@@ -85,12 +85,12 @@ public class LoginPage : ContentPage
                 new Button
                 {
                     Text = "LOG IN",
-                    Command = new Command(async () => await Shell.Current.GoToAsync("DashboardPage"))
+                    Command = new Command(async () => await Shell.Current.GoToAsync($"//{nameof(DashboardPage)}"))
                 }
             }
         };
 
-        Shell.SetNavBarIsVisible(Content, false);
+        //Shell.SetNavBarIsVisible(Content, false);
     }
 
     async void Submit()

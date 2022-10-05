@@ -25,7 +25,7 @@ public class FooterView : ContentView
 			BackgroundColor = Colors.White,
 			BorderColor = Colors.LightGray,
 			VerticalOptions = LayoutOptions.Center,
-			HeightRequest = 65,
+			HeightRequest = 62,
 
 			Content = grid
 		};
