@@ -4,8 +4,10 @@ public static class Address
 {
     public static class Base
     {
-        public static string BaseAddress = DeviceInfo.Platform == DevicePlatform.Android ?
-            "https://10.0.2.2:7157" : "https://localhost:7157";
+        public const string Port = "7157";
+        public const string Scheme = "https";
+        public static readonly string BaseAddress = DeviceInfo.Platform == DevicePlatform.Android ?
+            $"{Scheme}://10.0.2.2:{Port}" : $"{Scheme}://localhost:{Port}";
     }
 
     public static class Account

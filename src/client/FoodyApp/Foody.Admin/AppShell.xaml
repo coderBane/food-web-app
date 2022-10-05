@@ -7,10 +7,16 @@
     xmlns:pages="clr-namespace:Foody.Admin.Pages"
     xmlns:icons="clr-namespace:Foody.Admin.Utilities"
     Shell.TabBarIsVisible="False"
-    Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}"
-    Shell.FlyoutItemIsVisible="{OnIdiom Desktop=False, Default=True}"
+    FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}"
     FlyoutBackgroundColor="#323232">
+    
+    <!--Flyout Header-->
+    <Shell.FlyoutHeader>
+        <Grid HeightRequest="30">
+        </Grid>
+    </Shell.FlyoutHeader>
 
+    <!--Flyout Template-->
     <Shell.ItemTemplate>
         <DataTemplate>
             <Grid Margin="10,5" ColumnDefinitions="0.2*,0.8*" RowSpacing="20">
@@ -21,32 +27,34 @@
         </DataTemplate>
     </Shell.ItemTemplate>
 
-    <Shell.FlyoutHeader>
-        <Grid HeightRequest="30">
-        </Grid>
-    </Shell.FlyoutHeader>
-
+     <!--Start Page-->
     <ShellContent
         FlyoutItemIsVisible="False"
         Shell.FlyoutBehavior="Disabled"
         ContentTemplate="{DataTemplate pages:LoginPage}"
-        Route="LoginPage" />
+        Route="LoginPage"/>
 
-    <FlyoutItem Title="Dashboard" Icon="{x:Static icons:Icons.Dashboard}">
-        <ShellContent
-            ContentTemplate="{DataTemplate pages:DashboardPage}"/>
-
+    <!--Flyout Items-->
+    <FlyoutItem Route="DashboardPage" FlyoutDisplayOptions="AsMultipleItems">
+        <ShellContent Title="Dashboard"
+                      Icon="{x:Static icons:Icons.Dashboard}"
+                      ContentTemplate="{DataTemplate pages:DashboardPage}"/>
+        
+        <Tab Title="Items" Icon="{x:Static icons:Icons.Items}">
+            <ShellContent Title="Category" Icon="{x:Static icons:Icons.Categories}"
+                          ContentTemplate="{DataTemplate pages:Category.CategoryPage}"/>
+        </Tab>
     </FlyoutItem>
-    <FlyoutItem Title="Items" Icon="{x:Static icons:Icons.Items}">
-        <ShellContent
-            Title="Category" Icon="{x:Static icons:Icons.Categories}"
-            ContentTemplate="{DataTemplate pages:Category.CategoryPage}"/>
 
-    </FlyoutItem>
+    <!--<MenuItem Text="Log Out"
+              IconImageSource="{x:Static icons:Icons.LogoutWht}"/>-->
 
-    <MenuItem Text="Log Out"
-              IconImageSource="{x:Static icons:Icons.LogoutWht}"
-              Clicked="logout_Clicked"/>
+    <Shell.FlyoutFooter>
+        <StackLayout Padding="20">
+            <Button Text="Log Out" Command="{Binding LogoutCommand }" BackgroundColor="LimeGreen"
+                    ImageSource="{x:Static icons:Icons.LogoutWht}"/>
+        </StackLayout>
+    </Shell.FlyoutFooter>
 
 </Shell>
 

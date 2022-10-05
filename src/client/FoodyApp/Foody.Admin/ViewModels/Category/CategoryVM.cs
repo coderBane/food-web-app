@@ -36,6 +36,7 @@ public partial class CategoryVM : BaseViewModel
         try
         {
             IsBusy = true;
+            IsRefreshing = true;
 
             var result = await dataManager.Category.AllAsync(string.Empty);
 
@@ -59,6 +60,17 @@ public partial class CategoryVM : BaseViewModel
             IsBusy = false;
             IsRefreshing = false;
         }
+    }
+
+    [ICommand]
+    async Task Create()
+    {
+        await Shell.Current.GoToAsync("categorymod", true,
+    	new Dictionary<string, object>()
+        {
+            ["Category"] = new Models.Category(),
+            ["IsNew"] = true
+        });
     }
 
     [ICommand]

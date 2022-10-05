@@ -40,7 +40,7 @@
                        IsClippedToBounds="True">
                     <Image Aspect="AspectFill" HeightRequest="390" WidthRequest="390"
                            HorizontalOptions="Center" VerticalOptions="Center"
-                           Source="{Binding Category.Image.Content, Mode=OneWay, Converter={x:StaticResource Base64ImageConverter}}"/>
+                           Source="{Binding Category.Image.Content, Mode=OneWay, Converter={StaticResource Base64ImageConverter}}"/>
                 </Frame>
 
                <VerticalStackLayout Grid.Column="1" Spacing="10" Padding="10">
@@ -53,7 +53,7 @@
             </Grid>
 
             <HorizontalStackLayout Spacing="15">
-                <Button Text="Edit"/>
+                <Button Text="Edit" Command="{Binding EditCommand}"/>
                 <Button Text="Back" Command="{Binding GoBackCommand}"/>
             </HorizontalStackLayout>
 

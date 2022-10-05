@@ -1,9 +1,7 @@
-﻿using Foody.Admin.Pages;
-using Foody.Admin.ViewModels.Category;
+﻿using Foody.Admin.ViewModels.Category;
 using Foody.Admin.Authentication.Services;
 using Foody.Admin.Authentication.Interfaces;
 
-using System.Net.Http;
 
 namespace Foody.Admin;
 

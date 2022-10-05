@@ -5,7 +5,6 @@
              xmlns:viewmodel="clr-namespace:Foody.Admin.ViewModels.Category"
              xmlns:control="clr-namespace:Foody.Admin.Control"
              xmlns:template="clr-namespace:Foody.Admin.Templates"
-             xmlns:ext="clr-namespace:Foody.Admin.Utilities"
              x:DataType="viewmodel:CategoryVM"
              x:Class="Foody.Admin.Pages.Category.CategoryPage"
              BackgroundColor="WhiteSmoke"
@@ -13,50 +12,31 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <ext:BoolObjectConverter x:Key="BoolToColor"  TrueObject="Green" FalseObject="Red"/>
-            <ext:BoolObjectConverter x:Key="BoolToText" TrueObject="Active" FalseObject="Inactive"/>
             <DataTemplate x:Key="CategoryTemplate" x:DataType="model:Category">
                 <template:CatagoryTable/>
             </DataTemplate>
         </ResourceDictionary>
-
-        <Style TargetType="Label">
-            <Setter Property="TextColor" Value="Black"/>
-            <Setter Property="FontSize" Value="Medium"/>
-        </Style>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*,Auto" Margin="40,0,40,60">
+    <Grid RowDefinitions="Auto,*,100" Margin="40,0,40,40">
 
         <control:TopGridView Margin="-40,0"/>
 
-        <Grid Grid.Row="1" Margin="0,40" Padding="30">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+        <control:TableView Grid.Row="1"
+                           ColumnNames="{Binding Columns}"
+                           Collection="{Binding Categories}"
+                           Template="{StaticResource CategoryTemplate}"
+                           CreateCommand="{Binding CreateCommand}"
+                           IsReloadEnabled="{Binding IsNotBusy}"
+                           ReloadCommand="{Binding CategoryListCommand}"/>
 
-            <HorizontalStackLayout Spacing="20" VerticalOptions="StartAndExpand">
-                <Button Text="Create" WidthRequest="80" Clicked="Create_Button"/>
-                <ImageButton Source="{x:Static ext:Icons.Refresh}"
-                             IsEnabled="{Binding IsNotBusy}"
-                             Command="{Binding CategoryListCommand}"/>
-            </HorizontalStackLayout>
+        <!--<control:FooterView Grid.Row="2"/>-->
 
-            <control:TableView Grid.Row="1"
-                               Collection="{Binding Categories}"
-                               Template="{StaticResource CategoryTemplate}"
-                               ColumnNames="{Binding Columns}"/>
-
-            <ActivityIndicator Grid.RowSpan="2"
-                               IsVisible="{Binding IsBusy}"
-                               IsRunning="{Binding IsBusy}"
-                               VerticalOptions="CenterAndExpand"
-                               HorizontalOptions="FillAndExpand"/>
-            
-        </Grid>
-
-        <control:FooterView Grid.Row="2"/>
+        <ActivityIndicator Grid.Row="1"
+                           IsVisible="{Binding IsBusy}"
+                           IsRunning="{Binding IsBusy}"
+                           VerticalOptions="CenterAndExpand"
+                           HorizontalOptions="FillAndExpand"/>
 
     </Grid>
 

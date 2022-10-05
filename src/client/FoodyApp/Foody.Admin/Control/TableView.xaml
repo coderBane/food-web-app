@@ -3,30 +3,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Foody.Admin.Control.TableView"
              x:Name="This">
+
+    <ContentView.Resources>
+        <Style TargetType="Button">
+            <Setter Property="WidthRequest" Value="100"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="Black"/>
+            <Setter Property="FontSize" Value="{OnIdiom Desktop=Medium, Default=15}"/>
+        </Style>
+    </ContentView.Resources>
        
-    <VerticalStackLayout BindingContext="{Reference This}" Spacing="20" Margin="0,20" HorizontalOptions="FillAndExpand">
+    <VerticalStackLayout BindingContext="{Reference This}" Spacing="20" Margin="0,30" Padding="20">
+
+        <HorizontalStackLayout Spacing="20">
+            <Button Text="Create" Command="{Binding CreateCommand}"/>
+            <Button Text="Refresh" Command="{Binding ReloadCommand}" IsEnabled="{Binding IsReloadEnabled}"/>
+        </HorizontalStackLayout>
 
         <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*" IsVisible="{Binding HasSearchbar}">
             <Entry Grid.Column="0" Placeholder="Find.." TextColor="Black"/>
-            <Line HeightRequest="1" BackgroundColor="LightGray" Grid.Row="1" Grid.ColumnSpan="3"/>
+            <Line HeightRequest="2" BackgroundColor="LightGray" Grid.Row="1" Grid.ColumnSpan="3"/>
         </Grid>
 
-        <CollectionView
+        <Frame BackgroundColor="White" BorderColor="White" CornerRadius="0.0" HeightRequest="50">
+            <Grid ColumnDefinitions="{Binding Columns}" x:Name="columnNames">
+
+            </Grid>
+        </Frame>
+
+        <CollectionView Margin="0,-20,0,0"
             ItemsSource="{Binding Collection}"
             ItemTemplate="{Binding Template}"
             SelectionMode="None"
             EmptyView="No data..">
-
-            <CollectionView.Header>
-                <Grid HorizontalOptions="FillAndExpand">
-                    <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="0">
-                        <Grid ColumnDefinitions="{Binding Columns}" HorizontalOptions="FillAndExpand"
-                              x:Name="columnNames">
-
-                        </Grid>
-                    </Frame>
-                </Grid>
-            </CollectionView.Header>
 
         </CollectionView>
 

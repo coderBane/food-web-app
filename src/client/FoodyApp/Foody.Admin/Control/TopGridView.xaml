@@ -5,7 +5,7 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              x:Class="Foody.Admin.Control.TopGridView">
 
-    <Grid HeightRequest="260" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="40">
+    <Grid HeightRequest="{OnIdiom Desktop=260, Tablet=180}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="40">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
