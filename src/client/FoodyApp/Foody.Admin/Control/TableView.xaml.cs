@@ -1,11 +1,10 @@
 ﻿using System.Collections;
+using System.Windows.Input;
 
 namespace Foody.Admin.Control;
 
 public partial class TableView : ContentView
 {
-	public ObservableCollection<object> Item { get; } = new();
-
 	public static readonly BindableProperty HasSearchBarProperty =
 		BindableProperty.Create(nameof(HasSearchbar), typeof(bool), typeof(TableView), false);
 
@@ -19,7 +18,17 @@ public partial class TableView : ContentView
     public static readonly BindableProperty TemplateProperty =
 		BindableProperty.Create(nameof(Template), typeof(DataTemplate), typeof(TableView), default(DataTemplate));
 
-	public TableView()
+	public static readonly BindableProperty CreateCommandProperty =
+		BindableProperty.Create(nameof(CreateCommand), typeof(ICommand), typeof(TableView));
+
+    public static readonly BindableProperty ReloadCommandProperty =
+        BindableProperty.Create(nameof(ReloadCommand), typeof(ICommand), typeof(TableView));
+
+	public static readonly BindableProperty IsReloadEnabledProperty =
+		BindableProperty.Create(nameof(IsReloadEnabled), typeof(bool), typeof(TableView), true,
+			propertyChanged: (bindable, odlValue, newValue) => { });
+
+    public TableView()
 	{
 		InitializeComponent();
 	}
@@ -36,7 +45,25 @@ public partial class TableView : ContentView
 		set => SetValue(CollectionProperty, value);
 	}
 
-	public DataTemplate Template
+	public ICommand CreateCommand
+	{
+        get => (ICommand)GetValue(CreateCommandProperty);
+        set => SetValue(CreateCommandProperty, value);
+    }
+
+    public ICommand ReloadCommand
+    {
+        get => (ICommand)GetValue(ReloadCommandProperty);
+        set => SetValue(ReloadCommandProperty, value);
+    }
+
+	public bool IsReloadEnabled
+    {
+		get => (bool)GetValue(IsReloadEnabledProperty);
+		set => SetValue(IsReloadEnabledProperty, value);
+    }
+
+    public DataTemplate Template
 	{
 		get => (DataTemplate)GetValue(TemplateProperty);
 		set => SetValue(TemplateProperty, value);
@@ -58,11 +85,7 @@ public partial class TableView : ContentView
 				foreach (var name in ColumnNames)
                 {
                     definitions.Add(new());
-					columnNames.Add(new Label
-					{
-						Text = name,
-						TextColor = Colors.Black
-					}, count++);
+					columnNames.Add(new Label{ Text = name }, count++);
                 }
 
 			return definitions;
