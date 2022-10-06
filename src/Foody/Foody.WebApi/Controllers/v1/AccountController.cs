@@ -14,11 +14,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-
+using Foody.Data.Services;
 
 namespace Foody.WebApi.Controllers.v1
 {
-    public class AccountController : BaseController
+    public sealed class AccountController : BaseController
     {
         private readonly JwtConfig _jwtConfig;
 
@@ -28,10 +28,10 @@ namespace Foody.WebApi.Controllers.v1
 
         private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public AccountController(IUnitofWork unitofWork, IMapper mapper,
+        public AccountController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService,
             UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
             IOptionsMonitor<JwtConfig> optionsMonitor, TokenValidationParameters tokenValidationParameters)
-            : base(unitofWork, mapper)
+            : base(unitofWork, mapper, cacheService)
         {
             _userManager = userManager;
             _roleManager = roleManager;

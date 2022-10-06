@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Foody.Data.Services;
 using Foody.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,15 +15,38 @@ namespace Foody.WebApi.Controllers.v1
     [Route("v{version:apiVersion}/[controller]")]
     public class BaseController : ControllerBase
     {
+        private readonly ICacheService _cacheService;
+
         protected IUnitofWork _unitofWork;
+
+        protected string _cached = "";
 
         public readonly IMapper _mapper;
 
-        public BaseController(IUnitofWork unitofWork, IMapper mapper)
+        public BaseController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
         {
+            _cacheService = cacheService;
             _unitofWork = unitofWork;
             _mapper = mapper;
         }
+
+        internal T? GetCache<T>(string key)
+        {
+            var cacheData = _cacheService.GetData<T>(key);
+            return cacheData is null ? default :
+                cacheData is IEnumerable<object> en ? (en.Any() ? cacheData : default) : cacheData;
+        }
+
+        internal void SetCache<T>(string key, T data, string? collectionKey = default)
+        {
+            var expiryTime = DateTimeOffset.Now.AddMinutes(5);
+            _cacheService.SetData(key, data, expiryTime);
+
+            if (!string.IsNullOrEmpty(collectionKey))
+                DeleteCache(collectionKey);
+        }
+
+        internal void DeleteCache(string key) => _cacheService.RemoveData(key);
 
         internal static Error AddError(int code, string title, string message, ModelStateDictionary? modelState = default)
         {
@@ -49,6 +74,8 @@ namespace Foody.WebApi.Controllers.v1
                     ErrorsMessage.Generic.ValidationError,
                     string.Empty,
                     ModelState);
+
+                //WatchDog.WatchLogger.Log(result.Error.Title + " : " + result.Error.Message);
 
                 return UnprocessableEntity(result);
             }

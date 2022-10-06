@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Foody.Data.Interfaces;
+using Foody.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -7,7 +8,8 @@ namespace Foody.WebApi.Controllers.v1
 {
     public sealed class ContactController : BaseController
     {
-        public ContactController(IUnitofWork unitofWork, IMapper mapper) : base(unitofWork, mapper)
+        public ContactController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
+            : base(unitofWork, mapper, cacheService)
         {
         }
 
