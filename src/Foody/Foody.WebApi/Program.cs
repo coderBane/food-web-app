@@ -1,6 +1,7 @@
 ﻿using System.Text;
 
 using Foody.Data.Data;
+using Foody.Data.Services;
 using Foody.Data.Interfaces;
 using Foody.Auth.Configuration;
 
@@ -31,6 +32,8 @@ options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<FoodyDbC
 
 //Add UnitofWork DI
 builder.Services.AddScoped<IUnitofWork, UnitofWork>();
+
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 builder.Services.AddControllers();
 
