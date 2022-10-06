@@ -15,7 +15,7 @@ namespace Foody.Test.Systems.Controllers
             int count = 6;
             var fakeData = GetCategories(6);
             A.CallTo(() => unitofWork.Categories.All(string.Empty)).Returns(Task.FromResult(fakeData));
-            var controller = new CategoryController(unitofWork, mapper);
+            var controller = new CategoryController(unitofWork, mapper, cacheService);
 
             //Act
             var actionResult = await controller.Get();
@@ -37,7 +37,7 @@ namespace Foody.Test.Systems.Controllers
             collection.First().Id = id;
             A.CallTo(() => unitofWork.Categories.Get(id)).
                 Returns(Task.FromResult(collection.FirstOrDefault(c => c.Id == id)));
-            var controller = new CategoryController(unitofWork, mapper);
+            var controller = new CategoryController(unitofWork, mapper, cacheService);
 
             //Act
             var actionresult = await controller.Get(id);
@@ -56,7 +56,7 @@ namespace Foody.Test.Systems.Controllers
             //Arrange
             int id = 3;
             A.CallTo(() => unitofWork.Categories.Get(id)).Returns(Task.FromResult((Category?)null));
-            var controller = new CategoryController(unitofWork, mapper);
+            var controller = new CategoryController(unitofWork, mapper, cacheService);
 
             //Act
             var actionresult = await controller.Get(id);

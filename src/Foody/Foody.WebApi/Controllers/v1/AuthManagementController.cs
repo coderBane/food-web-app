@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
+using Foody.Data.Services;
 
 namespace Foody.WebApi.Controllers.v1
 {
@@ -15,8 +15,9 @@ namespace Foody.WebApi.Controllers.v1
 
         readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthManagementController(IUnitofWork unitofWork, IMapper mapper,
-            UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) : base(unitofWork, mapper)
+        public AuthManagementController(IUnitofWork unitofWork, IMapper mapper, ICacheService  cacheService,
+            UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+            : base(unitofWork, mapper, cacheService)
         {
             _userManager = userManager;
             _roleManager = roleManager;

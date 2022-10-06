@@ -49,7 +49,7 @@ namespace Foody.Data.Data
 
             if (!context.Subcribers.Any())
             {
-                var subs = Enumerable.Range(0, 5).Select(_ =>
+                Enumerable.Range(0, 5).Select(_ =>
                 {
                     var name = Faker.Name.First();
                     return new Newsletter
@@ -57,10 +57,7 @@ namespace Foody.Data.Data
                         Name = name,
                         Email = Faker.Internet.Email(name)
                     };
-                });
-
-                foreach (var sub in subs)
-                    context.Subcribers.Add(sub);
+                }).ToList().ForEach(x => context.Subcribers.Add(x));
             }
 
             context.SaveChanges();

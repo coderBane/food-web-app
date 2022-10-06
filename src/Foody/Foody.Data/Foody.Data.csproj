@@ -17,6 +17,9 @@
     <None Remove="Faker.Net" />
     <None Remove="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <None Remove="EFCore.NamingConventions" />
+    <None Remove="Services\" />
+    <None Remove="Microsoft.Extensions.Caching.StackExchangeRedis" />
+    <None Remove="StackExchange.Redis" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.9">
@@ -33,6 +36,8 @@
     <PackageReference Include="Faker.Net" Version="2.0.154" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.7" />
     <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.9" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.66" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foody.Entities\Foody.Entities.csproj" />
@@ -40,5 +45,6 @@
   <ItemGroup>
     <Folder Include="Interfaces\" />
     <Folder Include="Repositories\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 </Project>

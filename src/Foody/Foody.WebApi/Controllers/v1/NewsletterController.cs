@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Foody.Data.Interfaces;
+using Foody.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -7,8 +8,10 @@ namespace Foody.WebApi.Controllers.v1
 {
     public sealed class NewsletterController : BaseController
     {
-        public NewsletterController(IUnitofWork unitofWork, IMapper mapper) : base(unitofWork, mapper)
+        public NewsletterController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
+            : base(unitofWork, mapper, cacheService)
         {
+            this._cached = "subcribers";
         }
 
         // GET: api/values
@@ -18,8 +21,15 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(200, Type = typeof(Pagination<Newsletter>))]
         public async Task<IActionResult> Get()
         {
-            var subcribers = await _unitofWork.Subcribers.All(string.Empty);
-            return Ok(new Pagination<Newsletter>(subcribers));
+            var cachedData = GetCache<IEnumerable<Newsletter>>(_cached);
+
+            if (cachedData is null)
+            {
+                cachedData = await _unitofWork.Subcribers.All(string.Empty);
+                SetCache(_cached, cachedData);
+            }
+
+            return Ok(new Pagination<Newsletter>(cachedData));
         }
 
         // POST api/values
@@ -34,14 +44,14 @@ namespace Foody.WebApi.Controllers.v1
                 var subcriber = _mapper.Map<Newsletter>(dto);
 
                 var invalid = ValidateModel(subcriber, dto);
-                if (invalid is not null)
-                    return invalid;
+                if (invalid is not null) return invalid;
 
                 if (_unitofWork.Subcribers.Duplicate(subcriber.Email))
                     return NoContent();
 
                 _unitofWork.Subcribers.Add(subcriber);
                 await _unitofWork.CompleteAsync();
+                SetCache($"{subcriber.Id}", subcriber, _cached);
             }
             catch (Exception)
             {
@@ -79,6 +89,7 @@ namespace Foody.WebApi.Controllers.v1
             {
                 await _unitofWork.Subcribers.Delete(subcriber.Value);
                 await _unitofWork.CompleteAsync();
+                DeleteCache(_cached);
             }
             catch (Exception)
             {

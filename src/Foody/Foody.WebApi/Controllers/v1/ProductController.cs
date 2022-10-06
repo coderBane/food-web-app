@@ -4,15 +4,17 @@ using Foody.Entities.Models;
 using Foody.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Foody.Data.Services;
 
 namespace Foody.WebApi.Controllers.v1
 {
     public class ProductController : BaseController
     {
-        public ProductController(IUnitofWork unitofWork, IMapper mapper) : base(unitofWork, mapper)
+        public ProductController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
+            : base(unitofWork, mapper, cacheService)
         {
         }
+
 
         // GET: v1/Product
         [HttpGet]

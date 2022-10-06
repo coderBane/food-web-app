@@ -1,16 +1,20 @@
 ﻿using AutoMapper;
 using Foody.Entities.DTOs;
+using Foody.Data.Services;
 using Foody.Entities.Models;
 using Foody.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Foody.WebApi.Controllers.v1
 {
     public sealed class CategoryController : BaseController
     {
-        public CategoryController(IUnitofWork unitofWork, IMapper mapper) : base(unitofWork, mapper)
+        public CategoryController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
+            : base(unitofWork, mapper, cacheService)
         {
+            this._cached = "categories";
         }
 
         // GET: v1/Categories
@@ -18,11 +22,18 @@ namespace Foody.WebApi.Controllers.v1
         [HttpHead]
         [ProducesResponseType(200, Type = typeof(Pagination<CategoryDto>))]
         public async Task<IActionResult> Get()
-        { 
-            var categories = await _unitofWork.Categories.All(string.Empty);
-            var _dto = _mapper.Map<List<CategoryDto>>(categories);
+        {
+            var cacheData = GetCache<IEnumerable<CategoryDto>>(_cached);
 
-            return _unitofWork.Categories is not null ? Ok(new Pagination<CategoryDto>(_dto)) :
+            if (cacheData is null)
+            {
+                var categories = await _unitofWork.Categories.All(string.Empty);
+                var _dto = _mapper.Map<List<CategoryDto>>(categories);
+                cacheData = _dto;
+                SetCache(_cached, cacheData);
+            }
+
+            return _unitofWork.Categories is not null ? Ok(new Pagination<CategoryDto>(cacheData)) :
                 Problem(ErrorsMessage.Generic.NullSet, statusCode: 404, type: ErrorsMessage.Generic.NotFound);
         }
 
@@ -31,21 +42,27 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(200, Type = typeof(Result<CategoryDetailDto>))]
         public async Task<IActionResult> Get(int id)
         {
+            string key = $"{id}";
             var result = new Result<CategoryDetailDto>();
-            var category = await _unitofWork.Categories.Get(id);
 
-            if (category is null)
+            var cacheData = GetCache<CategoryDetailDto>(key);
+            if (cacheData is null)
             {
-                result.Error = AddError(404,
-                    ErrorsMessage.Generic.NotFound,
-                    ErrorsMessage.Category.NotExist);
+                var category = await _unitofWork.Categories.Get(id);
+                if (category is null)
+                {
+                    result.Error = AddError(404,
+                        ErrorsMessage.Generic.NotFound,
+                        ErrorsMessage.Category.NotExist);
 
-                return NotFound(result);
+                    return NotFound(result);
+                }
+                var _dto = _mapper.Map<CategoryDetailDto>(category);
+                cacheData = _dto;
+                SetCache(key, cacheData, _cached);
             }
 
-            var _dto = _mapper.Map<CategoryDetailDto>(category);
-
-            result.Content = _dto;
+            result.Content = cacheData;
             return Ok(result);
         }
 
@@ -61,28 +78,20 @@ namespace Foody.WebApi.Controllers.v1
                 var category = _mapper.Map<Category>(categoryModDto);
                 await Upload(category, categoryModDto.ImageUpload);
 
-                ModelState.ClearValidationState(nameof(categoryModDto));
-                if (!TryValidateModel(category))
-                {
-                    result.Error = AddError(422,
-                        ErrorsMessage.Generic.ValidationError, string.Empty,
-                        ModelState);
-
-                    return UnprocessableEntity(result);
-                }
+                var invalid = ValidateModel(category, categoryModDto);
+                if (invalid is not null) return invalid;
 
                 _unitofWork.Categories.Add(category);
                 await _unitofWork.CompleteAsync();
 
+                SetCache($"{category.Id}", category, _cached);
                 var _dto = _mapper.Map<CategoryDto>(category);
+                
                 result.Content = _dto;
-
                 return CreatedAtAction(nameof(Get), new { id = category.Id }, result);
             }
             catch (DbUpdateException) when (_unitofWork.Categories.Exists(categoryModDto.Name))
             {
-                //WatchDog.WatchLogger.Log(ex.InnerException!.Message);
-
                 result.Error = AddError(409,
                     ErrorsMessage.Generic.ValidationError,
                     ErrorsMessage.Category.Exists);
@@ -121,21 +130,12 @@ namespace Foody.WebApi.Controllers.v1
                 _mapper.Map(categoryModDto, category);
                 await Upload(category, categoryModDto.ImageUpload);
 
-                ModelState.ClearValidationState(nameof(categoryModDto));
-                if (!TryValidateModel(category))
-                {
-                    result.Error = AddError(422,
-                        ErrorsMessage.Generic.ValidationError,
-                        string.Empty,
-                        ModelState);
+                var invalid = ValidateModel(category, categoryModDto);
+                if (invalid is not null) return invalid;
 
-                    //WatchDog.WatchLogger.Log(result.Error.Title + " : " + result.Error.Message);
-
-                    return UnprocessableEntity(result);
-                }
-                    
                 await _unitofWork.Categories.Update(category);
                 await _unitofWork.CompleteAsync();
+                SetCache($"{category.Id}", category, _cached);
             }
             catch (DbUpdateConcurrencyException) when (!_unitofWork.Categories.Exists(id))
             {
@@ -153,6 +153,7 @@ namespace Foody.WebApi.Controllers.v1
 
                 return Conflict(result);
             }
+            catch(Exception) { }
 
             return NoContent();
         }
@@ -167,11 +168,11 @@ namespace Foody.WebApi.Controllers.v1
             {
                 await _unitofWork.Categories.Delete(id);
                 await _unitofWork.CompleteAsync();
+                DeleteCache($"{id}");
+                DeleteCache(_cached);
             }
             catch (NullReferenceException)
             {
-                //WatchDog.WatchLogger.Log(ex.Message);
-
                 result.Error = AddError(404,
                     ErrorsMessage.Generic.NotFound,
                     ErrorsMessage.Category.NotExist);
