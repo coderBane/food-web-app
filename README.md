@@ -21,12 +21,9 @@ Some requirement and workloads to install:
 - Git [git](https://git-scm.com/downloads)
 
 ## Setup
-
-### Clone the repository
-Open a command prompt(windows) or terminal(mac) and enter the command:
-```
-git clone https://github.com/coderBane/food-web-app.git
-```
+We need to setup a few things first before running the projects.
+- Database : PostgreSQL database
+- Distributed Cache : Redis distributed
 
 ### Setup Postgres Database
 
@@ -58,6 +55,18 @@ Create the database
 CREATE DATABASE foody;
 ```
 `NOTE: You can run the command \l to view all existing databases`
+
+### Setup Redis for Caching
+Create a redis container instance
+```
+docker run --name redis-cache -p 6379:6379 -d redis
+```
+
+### Clone the repository
+Open a command prompt(windows) or terminal(mac) and enter the command:
+```
+git clone https://github.com/coderBane/food-web-app.git
+```
 
 ### Configure the WebAPI
 
