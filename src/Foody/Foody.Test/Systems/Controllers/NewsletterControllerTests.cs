@@ -11,7 +11,7 @@ namespace Foody.Test.Systems.Controllers
             //Arrange
             var subs = Subcribers.GetSubcribers();
             A.CallTo(() => unitofWork.Subcribers.All(string.Empty)).Returns(Task.FromResult(subs));
-            var controller = new NewsletterController(unitofWork, mapper);
+            var controller = new NewsletterController(unitofWork, mapper, cacheService);
             var fakeSub = A.Dummy<NewsletterDto>();
             fakeSub.Email = subs.First().Email;
             fakeSub.Name = subs.First().Name;
