@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Foody.Entities.DTOs;
-using Foody.Entities.Models;
 using Foody.Data.Interfaces;
 
 
