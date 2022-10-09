@@ -27,7 +27,7 @@ namespace Foody.WebApi.Controllers.v1
 
             if (cacheData is null)
             {
-                var categories = await _unitofWork.Categories.All(string.Empty);
+                var categories = await _unitofWork.Categories.All();
                 var _dto = _mapper.Map<List<CategoryDto>>(categories);
                 cacheData = _dto;
                 SetCache(_cached, cacheData);
@@ -78,10 +78,10 @@ namespace Foody.WebApi.Controllers.v1
                 var category = _mapper.Map<Category>(categoryModDto);
                 await Upload(category, categoryModDto.ImageUpload);
 
-                var invalid = ValidateModel(category, categoryModDto);
+                var invalid = ValidateModel(category, categoryModDto, result);
                 if (invalid is not null) return invalid;
 
-                _unitofWork.Categories.Add(category);
+                await _unitofWork.Categories.Add(category);
                 await _unitofWork.CompleteAsync();
 
                 SetCache($"{category.Id}", category, _cached);
@@ -115,8 +115,7 @@ namespace Foody.WebApi.Controllers.v1
             var result = new Result<dynamic>();
 
             var category = await _unitofWork.Categories.Get(id);
-
-            if (category is null)
+            if (category is null || category.Id != id)
             {
                 result.Error = AddError(404,
                     ErrorsMessage.Generic.NotFound,
@@ -130,7 +129,7 @@ namespace Foody.WebApi.Controllers.v1
                 _mapper.Map(categoryModDto, category);
                 await Upload(category, categoryModDto.ImageUpload);
 
-                var invalid = ValidateModel(category, categoryModDto);
+                var invalid = ValidateModel(category, categoryModDto, result);
                 if (invalid is not null) return invalid;
 
                 await _unitofWork.Categories.Update(category);
@@ -153,7 +152,14 @@ namespace Foody.WebApi.Controllers.v1
 
                 return Conflict(result);
             }
-            catch(Exception) { }
+            catch(Exception)
+            {
+                result.Error = AddError(400,
+                    ErrorsMessage.Generic.BadRequest,
+                    ErrorsMessage.Generic.UnknownError);
+
+                return BadRequest(result);
+            }
 
             return NoContent();
         }
@@ -192,3 +198,4 @@ namespace Foody.WebApi.Controllers.v1
         }
     }
 }
+

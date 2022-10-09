@@ -43,13 +43,13 @@ namespace Foody.WebApi.Controllers.v1
             {
                 var subcriber = _mapper.Map<Newsletter>(dto);
 
-                var invalid = ValidateModel(subcriber, dto);
+                var invalid = ValidateModel(subcriber, dto, result);
                 if (invalid is not null) return invalid;
 
                 if (_unitofWork.Subcribers.Duplicate(subcriber.Email))
                     return NoContent();
 
-                _unitofWork.Subcribers.Add(subcriber);
+                await _unitofWork.Subcribers.Add(subcriber);
                 await _unitofWork.CompleteAsync();
                 SetCache($"{subcriber.Id}", subcriber, _cached);
             }

@@ -63,9 +63,8 @@ namespace Foody.WebApi.Controllers.v1
             };
         }
 
-        internal IActionResult? ValidateModel<T,D>(T entity, D dto)
+        internal UnprocessableEntityObjectResult? ValidateModel<E,D>(E entity, D dto, dynamic result)
         {
-            var result = new Result<dynamic>();
             ModelState.ClearValidationState(nameof(dto));
 
             if (!TryValidateModel(entity!))
@@ -74,8 +73,6 @@ namespace Foody.WebApi.Controllers.v1
                     ErrorsMessage.Generic.ValidationError,
                     string.Empty,
                     ModelState);
-
-                //WatchDog.WatchLogger.Log(result.Error.Title + " : " + result.Error.Message);
 
                 return UnprocessableEntity(result);
             }
