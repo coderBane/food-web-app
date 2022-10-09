@@ -19,6 +19,12 @@ public static class ErrorsMessage
         public const string Exists = "Category with given name already in database";
     }
 
+    public static class Product
+    {
+        public const string NotExist = "Product does not exist";
+        public const string Exists = "Prodcut with given name already in database";
+    }
+
     public static class Newsletter
     {
         public const string NotExist = "Email is not part of subscribtion list";
