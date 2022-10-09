@@ -33,7 +33,7 @@ namespace Foody.Data.Repositories
             }
         }
 
-        public override async Task<IEnumerable<T>> All(string search)
+        public override async Task<IEnumerable<T>> All(string? search)
         {
             return await _dbSet.Where(i => i.State == 1)
                                .AsNoTracking()

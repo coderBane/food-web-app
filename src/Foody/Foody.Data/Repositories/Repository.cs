@@ -17,12 +17,12 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet = _context.Set<T>();
     }
 
-    public virtual void Add(T entity)
+    public virtual async Task Add(T entity)
     {
-        _dbSet.Add(entity);
+        await _dbSet.AddAsync(entity);
     }
 
-    public virtual async Task<IEnumerable<T>> All(string search)
+    public virtual async Task<IEnumerable<T>> All(string? search)
     {
        return await _dbSet.AsNoTracking().ToListAsync();
     }

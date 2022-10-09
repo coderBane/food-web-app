@@ -12,7 +12,7 @@ namespace Foody.Data.Repositories
         { 
         }
 
-        public override async Task<IEnumerable<Product>> All(string search)
+        public override async Task<IEnumerable<Product>> All(string? search)
         {
             var products = _dbSet.Where(p => p.State == 1)
                 .Include(p => p.Category)

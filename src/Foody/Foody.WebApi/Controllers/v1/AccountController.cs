@@ -303,7 +303,7 @@ namespace Foody.WebApi.Controllers.v1
                 ExipryDate = DateTime.UtcNow.AddMonths(6),
             };
 
-            _unitofWork.RefreshToken.Add(refreshToken);
+            await _unitofWork.RefreshToken.Add(refreshToken);
             await _unitofWork.CompleteAsync();
 
             //var tokenData = new TokenData
