@@ -22,7 +22,7 @@ public sealed record Contact
     public string Subject { get; init; } = null!;
 
     [DataType(DataType.MultilineText)]
-    public string? Message { get; init; } = null!;
+    public string? Message { get; init; }
 
     [ScaffoldColumn(false)]
     public DateTime Date { get; init; } = DateTime.UtcNow; 
