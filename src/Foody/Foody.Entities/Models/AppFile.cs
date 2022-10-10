@@ -2,7 +2,7 @@
 {
     public sealed class AppFile : BaseEntity
     {
-        [MaxLength(1048576, ErrorMessage = "Max upload size is 2MB.")]
+        [MaxLength(1048576, ErrorMessage = "Max upload size is 1MB.")]
         public byte[] Content { get; set; } = null!;
 
         public string UntrustedName { get; set; } = null!;
