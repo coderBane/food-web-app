@@ -29,6 +29,8 @@
     <None Remove="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <None Remove="Profiles\" />
     <None Remove="WatchDog.NET" />
+    <None Remove="Extensions\" />
+    <None Remove="Extensions\Services\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foody.Data\Foody.Data.csproj">
@@ -53,5 +55,7 @@
     <Folder Include="wwwroot\images\" />
     <Folder Include="Controllers\v1\" />
     <Folder Include="Profiles\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Extensions\Services\" />
   </ItemGroup>
 </Project>
