@@ -16,7 +16,7 @@ namespace Foody.Test.Helpers
             if (!isValid)
             {
                 results.ForEach(err
-                    => actionContext.ModelState.AddModelError(err.MemberNames.First() ?? string.Empty, err.ErrorMessage));
+                    => actionContext.ModelState.AddModelError(err.MemberNames.First() ?? string.Empty, err.ErrorMessage!));
             }
         }
     }
