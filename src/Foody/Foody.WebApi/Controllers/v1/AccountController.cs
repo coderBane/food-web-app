@@ -18,23 +18,17 @@ using Foody.Data.Services;
 
 namespace Foody.WebApi.Controllers.v1
 {
-    public sealed class AccountController : BaseController
+    public sealed class AccountController : AuthBaseController
     {
         private readonly JwtConfig _jwtConfig;
-
-        private readonly UserManager<IdentityUser> _userManager;
-
-        private readonly RoleManager<IdentityRole> _roleManager;
 
         private readonly TokenValidationParameters _tokenValidationParameters;
 
         public AccountController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService,
             UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
             IOptionsMonitor<JwtConfig> optionsMonitor, TokenValidationParameters tokenValidationParameters)
-            : base(unitofWork, mapper, cacheService)
+            : base(unitofWork, mapper, cacheService, userManager, roleManager)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
             _jwtConfig = optionsMonitor.CurrentValue;
             _tokenValidationParameters = tokenValidationParameters;
         }
