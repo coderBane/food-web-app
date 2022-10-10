@@ -1,6 +1,6 @@
 ﻿namespace Foody.Entities.Models;
 
-public sealed record Contact
+public sealed record Contact : IEntity
 {
     [Key]
     public int Id { get; init; }

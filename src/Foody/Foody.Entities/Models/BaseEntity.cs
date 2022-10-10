@@ -1,6 +1,11 @@
 namespace Foody.Entities.Models;
 
-public abstract class BaseEntity
+public interface IEntity
+{
+    
+}
+
+public abstract class BaseEntity : IEntity
 {
     [Key]
     [Column(Order = 0)]
