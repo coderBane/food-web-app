@@ -31,6 +31,7 @@
     <None Remove="WatchDog.NET" />
     <None Remove="Extensions\" />
     <None Remove="Extensions\Services\" />
+    <None Remove="Filters\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foody.Data\Foody.Data.csproj">
@@ -57,5 +58,6 @@
     <Folder Include="Profiles\" />
     <Folder Include="Extensions\" />
     <Folder Include="Extensions\Services\" />
+    <Folder Include="Filters\" />
   </ItemGroup>
 </Project>
