@@ -89,3 +89,16 @@ public class ProductModDto : ItemModDto
     [DataType(DataType.MultilineText)]
     public string Description { get; set; }
 }
+
+public class ProdCategoryDto : ItemDto
+{
+    public string Image { get; set; }
+
+    public int Category { get; set; }
+
+    public int Quantity { get; set; }
+
+    public decimal Price { get; set; }
+
+    public string Description { get; set; }
+}
