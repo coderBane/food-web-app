@@ -7,8 +7,9 @@ namespace Foody.Test.Systems.Controllers
 {
     public class ContactControllerTests : TestBase
     {
-        int id = 0;
-        string search = string.Empty;
+        static readonly int id = 0;
+        readonly string key = $"{id}";
+        readonly string search = string.Empty;
 
         [Fact]
         public async void Get_All_ReturnOk()
@@ -78,7 +79,7 @@ namespace Foody.Test.Systems.Controllers
         {
             //Arrange
             var fakeData = A.CollectionOfDummy<Contact>(3).AsEnumerable();
-            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(null);
+            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
             A.CallTo(() => unitofWork.Contacts.Get(id))
                 .Returns(Task.FromResult(fakeData.FirstOrDefault(fk => fk.Id == id)));
 
@@ -100,7 +101,7 @@ namespace Foody.Test.Systems.Controllers
         {
             //Arrange
             var fakeData = InquiriesFixtures.GetContacts().FirstOrDefault(c => c.Id == id);
-            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(null);
+            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
             A.CallTo(() => unitofWork.Contacts.Get(id))
                 .Returns(Task.FromResult(fakeData));
             var controller = new ContactController(unitofWork, mapper, cacheService);
@@ -121,7 +122,7 @@ namespace Foody.Test.Systems.Controllers
         {
             //Arrange
             int id = 300;
-            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(null);
+            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
             A.CallTo(() => unitofWork.Contacts.Get(id)).Returns(Task.FromResult((Contact?)null));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
@@ -135,6 +136,23 @@ namespace Foody.Test.Systems.Controllers
             Assert.NotNull(data.Error);
             Assert.Null(data.Content);
         }
+
+        //[Fact]
+        //public async Task Get_Inquiry_ReturnServerErrorr()
+        //{
+        //    //Arrange
+        //    A.CallTo(() => cacheService.GetData<Contact>(key)).Returns(Task.FromResult((Contact?)null));
+        //    A.CallTo(() => unitofWork.Contacts.Get(id)).ThrowsAsync(() => new Exception("Exception Occurred."));
+        //    var controller = new ContactController(unitofWork, mapper, cacheService);
+
+        //    //Act
+        //    var actionResult = await controller.Get(id);
+
+        //    //Assert
+        //    var result = Assert.IsType<ObjectResult>(actionResult);
+        //    Assert.IsAssignableFrom<Result<object>>(result.Value);
+        //    Assert.Equal(500, result.StatusCode);
+        //}
     }
 }
 
