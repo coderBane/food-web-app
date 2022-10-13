@@ -2,10 +2,10 @@
 
 public interface ICacheService
 {
-    T? GetData<T>(string key);
+    Task<T?> GetData<T>(string key);
 
-    bool SetData<T>(string key, T Value, DateTimeOffset expirationTime);
+    Task<bool> SetData<T>(string key, T Value, DateTimeOffset expirationTime);
 
-    bool RemoveData(string key);
+    Task<bool> RemoveData(string key);
 }
 
