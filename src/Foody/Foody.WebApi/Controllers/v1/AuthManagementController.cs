@@ -1,27 +1,20 @@
 ﻿using AutoMapper;
+using Foody.Data.Services;
 using Foody.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Foody.Data.Services;
+
 
 namespace Foody.WebApi.Controllers.v1
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public class AuthManagementController : BaseController
+    public sealed class AuthManagementController : AuthBaseController
     {
-        readonly UserManager<IdentityUser> _userManager;
-
-        readonly RoleManager<IdentityRole> _roleManager;
-
         public AuthManagementController(IUnitofWork unitofWork, IMapper mapper, ICacheService  cacheService,
             UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
-            : base(unitofWork, mapper, cacheService)
-        {
-            _userManager = userManager;
-            _roleManager = roleManager;
-        }
+            : base(unitofWork, mapper, cacheService, userManager, roleManager) { }
 
         [HttpPost("{role}")]
         public async Task<IActionResult> AddRole(string role)

@@ -6,6 +6,7 @@ public static class ErrorsMessage
     {
         public const string BadRequest = "Bad Request";
         public const string NotFound = "Not found";
+        public const string ServerError = "Server Error";
         public const string NullSet = "Entity set is null";
         public const string InvalidRequest = "Invalid Request";
         public const string AddFailure = "Failed to Add Entity";
@@ -17,6 +18,12 @@ public static class ErrorsMessage
     {
         public const string NotExist = "Category does not exist";
         public const string Exists = "Category with given name already in database";
+    }
+
+    public static class Product
+    {
+        public const string NotExist = "Product does not exist";
+        public const string Exists = "Product with given name already in database";
     }
 
     public static class Newsletter
