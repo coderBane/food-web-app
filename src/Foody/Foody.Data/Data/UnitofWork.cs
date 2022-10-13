@@ -1,17 +1,17 @@
-﻿using System;
-using Foody.Data.Interfaces;
+﻿using Foody.Data.Interfaces;
 using Foody.Data.Repositories;
 using System.Diagnostics.CodeAnalysis;
 
+
 namespace Foody.Data.Data;
 
-public class UnitofWork : IUnitofWork, IDisposable
+public sealed class UnitofWork : IUnitofWork, IDisposable
 {
     private readonly FoodyDbContext _context;
 
     public UnitofWork(FoodyDbContext context)
     {
-        _context = context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
         Categories = new CategoryRepository(_context);
         Products = new ProductRepository(_context);
         RefreshToken = new RefreshTokenRepository(_context);

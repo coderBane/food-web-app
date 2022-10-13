@@ -38,7 +38,7 @@ namespace Foody.WebApi.Profiles
         public Category Convert(int source, Category destination, ResolutionContext context)
         {
             return _unitofWork.Categories.Exists(source)
-                ? _unitofWork.Categories.Find(x => x.Id == source).First()
+                ? _unitofWork.Categories.Find(x => x.Id == source).Single()
                 : throw new NullReferenceException("Category is null.", new ArgumentException($"CategoryId '{source}' is not valid."));
         }
     }
