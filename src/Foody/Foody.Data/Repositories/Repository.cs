@@ -43,8 +43,10 @@ public class Repository<T> : IRepository<T> where T : class
     {
         var entity = await Get(id);
 
-        if (entity is not null)
-            _dbSet.Remove(entity);
+        if (entity is null)
+            throw new NullReferenceException($"{nameof(entity)} with given id does not exist");
+
+        _dbSet.Remove(entity);
     }
 }
 

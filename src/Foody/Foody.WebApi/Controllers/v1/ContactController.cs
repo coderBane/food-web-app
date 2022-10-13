@@ -17,14 +17,17 @@ namespace Foody.WebApi.Controllers.v1
         // GET: api/values
         [HttpGet]
         [Route("Inquiries")]
+        [ProducesResponseType(200, Type = typeof(Pagination<Contact>))]
         public async Task<IActionResult> Get(string? search)
         {
-            var cacheData = GetCache<IEnumerable<Contact>>(_cached);
+            bool cacheEnable = string.IsNullOrEmpty(search);
 
+            var cacheData = cacheEnable ? await GetCache<IEnumerable<Contact>>(_cached) : null;
             if (cacheData is null)
             {
                 cacheData = await _unitofWork.Contacts.All(search);
-                SetCache(_cached, cacheData);
+                if (cacheEnable)
+                    await SetCache(_cached, cacheData);
             }
 
             return Ok(new Pagination<Contact>(cacheData));
@@ -32,12 +35,13 @@ namespace Foody.WebApi.Controllers.v1
 
         // GET api/values/5
         [HttpGet("Inquiry/{id}")]
+        [ProducesResponseType(200, Type = typeof(Result<Contact>))]
         public async Task<IActionResult> Get(int id)
         {
             string key = $"{id}";
             var result = new Result<Contact>();
 
-            var cacheData = GetCache<Contact>(key);
+            var cacheData = await GetCache<Contact>(key);
             if (cacheData is null)
             {
                 var message = await _unitofWork.Contacts.Get(id);
@@ -52,7 +56,7 @@ namespace Foody.WebApi.Controllers.v1
                 }
 
                 cacheData = message;
-                SetCache(key, message, _cached);
+                await SetCache(key, message);
             }
 
             result.Content = cacheData;
@@ -62,32 +66,21 @@ namespace Foody.WebApi.Controllers.v1
         // POST api/values
         [HttpPost]
         [Route("Inquire")]
+        [ProducesResponseType(200, Type = typeof(Result<string>))]
         public async Task<IActionResult> Post([FromForm] ContactDto dto)
         {
-            var result = new Result<dynamic>();
+            var result = new Result<string>();
 
-            try
-            {
-                var message = _mapper.Map<Contact>(dto);
+            var message = _mapper.Map<Contact>(dto);
 
-                var invalid = ValidateModel(message, dto, result);
-                if (invalid is not null) return invalid;
+            var invalid = ValidateModel(message, dto, result);
+            if (invalid is not null) return invalid;
 
-                await _unitofWork.Contacts.Add(message);
-                await _unitofWork.CompleteAsync();
-                SetCache($"{message.Id}", message);
+            await _unitofWork.Contacts.Add(message);
+            await _unitofWork.CompleteAsync();
+            await SetCache($"{message.Id}", message, _cached);
 
-                result.Content = "Message Sent!";
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                result.Error = AddError(400,
-                    ErrorsMessage.Generic.BadRequest,
-                    ErrorsMessage.Generic.UnknownError);
-
-                return BadRequest(result);
-            }
+            result.Content = "Message Sent!";
 
             return Ok(result);
         }
