@@ -1,18 +1,20 @@
 ﻿using Foody.Test.Helpers;
 using Foody.Test.Fixtures;
 using Foody.Utilities.Messages;
-using Foody.Utilities.Responses;
+
 
 namespace Foody.Test.Systems.Controllers
 {
     public class CategoryControllerTests : TestBase
     {
+        private readonly string name = "Rice";
+
         [Fact]
         public async Task Post_Return201()
         {
             //Arrange
             var fakeData = A.Dummy<CategoryModDto>();
-            fakeData.Name = "Rice";
+            fakeData.Name = name;
 
             var controller = new CategoryController(unitofWork, mapper, cacheService);
             controller.ObjectValidator = new ObjectValidator();
@@ -32,10 +34,10 @@ namespace Foody.Test.Systems.Controllers
         {
             //Arrange
             var fakeDto = A.Dummy<CategoryModDto>();
-            fakeDto.Name = "Rice";
+            fakeDto.Name = name;
 
-            var fakeEntity = mapper.Map<Category>(fakeDto);
-            A.CallTo(() => unitofWork.Categories.Add(fakeEntity)).Returns(Task.CompletedTask);
+            //var fakeEntity = mapper.Map<Category>(fakeDto);
+            //A.CallTo(() => unitofWork.Categories.Add(fakeEntity)).Returns(Task.CompletedTask);
 
             var controller = new CategoryController(unitofWork, mapper, cacheService);
             controller.ObjectValidator = new ObjectValidator();
@@ -53,7 +55,7 @@ namespace Foody.Test.Systems.Controllers
         {
             //Arrange
             var fakeData = A.Dummy<CategoryModDto>();
-            fakeData.Name = "T";
+            fakeData.Name = "T"; // name less than 4 characters
             var controller = new CategoryController(unitofWork, mapper, cacheService);
             controller.ObjectValidator = new ObjectValidator();
 
@@ -68,14 +70,13 @@ namespace Foody.Test.Systems.Controllers
         }
 
         [Fact]
-        public async Task Post_NameIndexException_Returns409()
+        public async Task Post_NameIndexConstraintFailed_Returns409()
         {
             //Arrange
             var fakeData = A.Dummy<CategoryModDto>();
-            fakeData.Name = "Rice";
+            fakeData.Name = name;
 
-            A.CallTo(() => unitofWork.CompleteAsync()).ThrowsAsync(() => new DbUpdateException());
-            A.CallTo(() => unitofWork.Categories.Exists(fakeData.Name)).Returns(true);
+            A.CallTo(() => unitofWork.Categories.Exists(fakeData.Name)).Returns(Task.FromResult(true));
 
             var controller = new CategoryController(unitofWork, mapper, cacheService);
             controller.ObjectValidator = new ObjectValidator();
@@ -84,8 +85,11 @@ namespace Foody.Test.Systems.Controllers
             var actionResult = await controller.Post(fakeData);
 
             //Assert
+            A.CallTo(() => unitofWork.CompleteAsync()).MustNotHaveHappened();
             var result = Assert.IsType<ConflictObjectResult>(actionResult);
             var data = Assert.IsAssignableFrom<Result<CategoryDto>>(result.Value);
+            Assert.NotNull(data.Error);
+            Assert.Equal(409, data.Error.Code);
             Assert.Null(data.Content);
         }
 
@@ -94,11 +98,11 @@ namespace Foody.Test.Systems.Controllers
         {
             //Arrange
             var fakeDto = A.Dummy<CategoryModDto>();
-            fakeDto.Name = "Rice";
+            fakeDto.Name = name;
             fakeDto.IsActive = true;
 
             var fakeEntity = ItemFixtures.GetCategory();
-            A.CallTo(() => unitofWork.Categories.Get(fakeEntity.Id)).Returns(fakeEntity);
+            A.CallTo(() => unitofWork.Categories.Get(fakeEntity.Id)).Returns(Task.FromResult(fakeEntity));
             A.CallTo(() => unitofWork.Categories.Update(fakeEntity)).Returns(Task.CompletedTask);
 
             var controller = new CategoryController(unitofWork, mapper, cacheService);
@@ -154,6 +158,27 @@ namespace Foody.Test.Systems.Controllers
             var result = Assert.IsType<UnprocessableEntityObjectResult>(actionResult);
             var data = Assert.IsAssignableFrom<Result<object>>(result.Value);
             Assert.False(data.Success);
+        }
+
+        [Fact]
+        public async Task Put_Product_ConcurrencyExceptionThrown()
+        {
+            //Arrange
+            var fakeDto = A.Dummy<CategoryModDto>();
+            fakeDto.Name = name;
+
+            A.CallTo(() => unitofWork.Categories.Exists(default(int))).Returns(false);
+            A.CallTo(() => unitofWork.CompleteAsync()).ThrowsAsync(() => new DbUpdateConcurrencyException());
+
+            var controller = new CategoryController(unitofWork, mapper, cacheService);
+            controller.ObjectValidator = new ObjectValidator();
+
+            //Act
+            var actionResult = await controller.Put(default, fakeDto);
+
+            //Assert
+            var result = Assert.IsType<NotFoundObjectResult>(actionResult);
+            var data = Assert.IsType<Result<object>>(result.Value);
         }
     }
 }
