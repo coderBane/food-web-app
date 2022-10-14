@@ -30,6 +30,7 @@
     <None Remove="Fixtures\" />
     <None Remove="Helpers\" />
     <None Remove="Systems\Repositories\" />
+    <None Remove="Systems\Filters\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Systems\" />
@@ -38,6 +39,7 @@
     <Folder Include="Fixtures\" />
     <Folder Include="Helpers\" />
     <Folder Include="Systems\Repositories\" />
+    <Folder Include="Systems\Filters\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Foody.WebApi\Foody.WebApi.csproj" />
