@@ -1,7 +1,5 @@
 ﻿using Foody.Data.Data;
 using Foody.WebApi.Extensions;
-using Microsoft.AspNetCore.Identity;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
