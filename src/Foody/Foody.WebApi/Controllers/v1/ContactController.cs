@@ -11,7 +11,7 @@ namespace Foody.WebApi.Controllers.v1
         public ContactController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
             : base(unitofWork, mapper, cacheService)
         {
-            this._cached = "inquiries";
+            _cached = "inquiries";
         }
 
         // GET: api/values
@@ -86,8 +86,18 @@ namespace Foody.WebApi.Controllers.v1
         }
 
         [HttpPost("Reply/{email}")]
-        public IActionResult Post(string email)
+        public async Task<IActionResult> Post(string email)
         {
+            // var mail = new EmailDto
+            // {
+            //     Subject = "Newsletter Subriction",
+            //     From = "foody.support@example.com",
+            //     To = email,
+            //     Body = await System.IO.File.ReadAllTextAsync("wwwroot/html/signup.html"),
+            // };
+
+            // await _emailService.SendMail(mail);
+
             return Ok();
         }
     }

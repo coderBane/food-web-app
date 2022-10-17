@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
+
 namespace Foody.WebApi.Extensions.Services;
 
 public class DataServiceExtension : IServiceExtension
@@ -28,6 +29,9 @@ public class DataServiceExtension : IServiceExtension
 
         // Add Caching DI
         services.AddSingleton<ICacheService, CacheService>();
+
+        // Add Email service DI
+        services.AddTransient<IEmailService, EmailService>();
     }
 }
 

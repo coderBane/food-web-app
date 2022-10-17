@@ -11,7 +11,7 @@ namespace Foody.WebApi.Controllers.v1
         public NewsletterController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
             : base(unitofWork, mapper, cacheService)
         {
-            this._cached = "subcribers";
+            _cached = "subcribers";
         }
 
         // GET: api/values

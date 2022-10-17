@@ -50,6 +50,7 @@
   <ItemGroup>
     <Content Remove="wwwroot\" />
     <Content Remove="wwwroot\images\" />
+    <Content Remove="wwwroot\html\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\" />
@@ -59,5 +60,6 @@
     <Folder Include="Extensions\" />
     <Folder Include="Extensions\Services\" />
     <Folder Include="Filters\" />
+    <Folder Include="wwwroot\html\" />
   </ItemGroup>
 </Project>

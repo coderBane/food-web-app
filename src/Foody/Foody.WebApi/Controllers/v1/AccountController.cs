@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 
 using Foody.Auth.DTOs;
-using Foody.Auth.Models;
-using Foody.Entities.Models;
 using Foody.Data.Interfaces;
 using Foody.Auth.Configuration;
 
