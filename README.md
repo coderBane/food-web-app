@@ -33,7 +33,7 @@ docker pull postgres
 ```
 Create a container instance
 ```
-docker run --name postgresql -e POSTGRES_PASSWORD=<yourpassword> -p 55000:5432 -d postgres
+docker run --name postgresql -e POSTGRES_PASSWORD=<yourpassword> -p 5432:5432 -d postgres
 ```
 Run psql
 ```
@@ -90,7 +90,8 @@ Create a new file 's.json' and populate it with the following
         "Username": "<yourusername>",
         "Password": "<yourpassword>"
     },
-    "Postgres": "Server=localhost:55000;Database=foody;User Id=devuser;Password=<devuserpassword>;Integrated Security=true;Pooling=true;",
+    "Redis": "localhost",
+    "Postgres": "Server=localhost:5342;Database=foody;User Id=devuser;Password=<devuserpassword>;Integrated Security=true;Pooling=true;",
     "UserPW": "<yourpassword>"
 }
 ```
