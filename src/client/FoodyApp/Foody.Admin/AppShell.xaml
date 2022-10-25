@@ -44,6 +44,10 @@
             <ShellContent Title="Category" Icon="{x:Static icons:Icons.Categories}"
                           ContentTemplate="{DataTemplate pages:Category.CategoryPage}"/>
         </Tab>
+
+        <ShellContent Title="Messages"
+                      Icon="{Static icons:Icons.Inbox}"
+                      ContentTemplate="{DataTemplate pages:Contact.ContactPage}"/>
     </FlyoutItem>
 
     <!--<MenuItem Text="Log Out"

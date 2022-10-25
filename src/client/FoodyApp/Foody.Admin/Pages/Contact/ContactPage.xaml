@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:Foody.Admin.Models"
+             xmlns:control="clr-namespace:Foody.Admin.Control"
+             xmlns:viewmodel="clr-namespace:Foody.Admin.ViewModels.Contact"
+             x:DataType="viewmodel:ContactVM"
+             x:Class="Foody.Admin.Pages.Contact.ContactPage"
+             BackgroundColor="WhiteSmoke"
+             Title="{Binding Title}">
+
+    <Grid Margin="40,0,40,40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <control:TopGridView Margin="-40,0"/>
+
+        <Grid Grid.Row="1" RowDefinitions="Auto, *" Margin="0,20" RowSpacing="15">
+
+            <Button Text="Refresh" Command="{Binding GetAllCommand}"/>
+
+            <Grid Grid.Row="1" RowDefinitions="*, Auto" ColumnDefinitions="1*,Auto,2*" BackgroundColor="Black" x:Name="mgrid">
+
+                <CollectionView Grid.Column="0" ItemsSource="{Binding Inquiries}" Margin="20,0">
+                    <CollectionView.Header>
+                        <Grid RowDefinitions="*,*" RowSpacing="15">
+                            <Label Text="Messages" FontSize="Title"/>
+                            <Entry Grid.Row="1" Placeholder="Search" BackgroundColor="DarkGrey" Margin="0,0,0,20"/>
+                        </Grid>
+                    </CollectionView.Header>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Inquiry">
+                            <Frame Padding="20,10" BackgroundColor="Transparent" BorderColor="Transparent">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer  CommandParameter="{Binding .}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:ContactVM}}, Path=ReadMessageCommand}"/>
+                                </Frame.GestureRecognizers>
+                                <Grid RowDefinitions="*,*" RowSpacing="5">
+                                    <Label Text="{Binding Name}" FontSize="Large" FontAttributes="Bold"/>
+                                    <Label Grid.Row="1" Text="{Binding Subject}" FontSize="Medium"/>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Frame Grid.Row="1" Grid.Column="0">
+                    <Grid ColumnDefinitions="*,*,*" HorizontalOptions="Center">
+
+                        <Label Grid.Column="1" Text="Unread"/>
+
+                    </Grid>
+                </Frame>
+
+                <Line Grid.Column="1" Grid.RowSpan="2" WidthRequest="1"
+                     HeightRequest="{Binding Source={x:Reference mgrid}, Path=Height}"/>
+
+                <ScrollView Grid.Column="2">
+                    <Frame Margin="30,40,30,30">
+                        <VerticalStackLayout Spacing="10" Padding="20">
+
+                            <Label Text="{Binding SelectedInquiry.Name, StringFormat='From: {0}'}" FontSize="Subtitle" FontAttributes="Bold"/>
+
+                            <Line HeightRequest="1" BackgroundColor="LightGray"/>
+
+                            <Label Text="{Binding SelectedInquiry.Subject}" FontSize="Title" FontAttributes="Bold" Margin="0,20"/>
+
+                            <Label Text="{Binding SelectedInquiry.Message}" FontSize="Medium"/>
+
+                        </VerticalStackLayout>
+                    </Frame>
+                </ScrollView>
+
+                <Frame Grid.Row="1" Grid.Column="2" Margin="30,0">
+                    <Button Text="Reply" HorizontalOptions="EndAndExpand"/>
+                </Frame>
+
+            </Grid>
+
+        </Grid>
+
+        <control:FooterView Grid.Row="2"/>
+
+    </Grid>
+
+</ContentPage>

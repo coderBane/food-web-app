@@ -68,6 +68,9 @@
 	  <MauiXaml Update="Control\TableView.xaml">
 	    <SubType></SubType>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\Contact\ContactPage.xaml">
+	    <SubType></SubType>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>
