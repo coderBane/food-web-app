@@ -1,21 +1,20 @@
-﻿using System.Net.Http.Headers;
+﻿namespace Foody.Admin.Rest.Services;
 
-
-namespace Foody.Admin.Rest.Services;
-
-public class RestService<T> : IRestService<T> where T : class
+public class RestService<T> : IRestService<T> where T : class, IEntity
 {
     protected string url;
     protected readonly HttpClient _client;
+    readonly IHttpsClientHandlerService _httpsClientHandler;
 
     PagedResult<T> pagedResult;
     Result<T> result;
     internal Result<dynamic> single;
 
-    public RestService()
+    public RestService(IHttpsClientHandlerService httpsClientHandler)
     {
 #if DEBUG
-        new HttpsClientHandlerService(out _client);
+        _httpsClientHandler = httpsClientHandler;
+        _httpsClientHandler.Initialize(out _client);
         if (_client is null)
             _client = new();
 #else
@@ -24,10 +23,8 @@ public class RestService<T> : IRestService<T> where T : class
         _client.BaseAddress = new Uri(Address.Base.BaseAddress); 
     }
 
-    public async Task<PagedResult<T>> AllAsync(string search)
+    public async Task<PagedResult<T>> AllAsync()
     {
-        this.url += !string.IsNullOrEmpty(search) ? $"?search={search}" : default;
-
         try
         {
             var response = await _client.GetAsync(url);
@@ -64,7 +61,7 @@ public class RestService<T> : IRestService<T> where T : class
         return result;
     }
 
-    public virtual async Task<Result<dynamic>> SaveDataAsync(T entity, bool isNew = false)
+    public virtual async Task<Result<dynamic>> SaveDataAsync(T entity, bool isNew)
     {
         try
         {
@@ -73,7 +70,7 @@ public class RestService<T> : IRestService<T> where T : class
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = isNew ? await _client.PostAsync(url, content) :
-                               await _client.PutAsync($"{url}", content);
+                               await _client.PutAsync($"{url}/{entity.Id}", content);
 
             response.EnsureSuccessStatusCode();
             single = await response.Content.ReadFromJsonAsync<Result<dynamic>>();

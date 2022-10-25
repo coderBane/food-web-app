@@ -1,6 +1,11 @@
 ﻿namespace Foody.Admin.Models;
 
-public abstract class Base
+public interface IEntity
+{
+    int Id { get; set; }
+}
+
+public abstract class Base : IEntity
 {
     internal JsonSerializerOptions _options;
 
