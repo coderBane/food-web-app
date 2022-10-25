@@ -1,6 +1,4 @@
-﻿using System;
-using Foody.Entities.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -59,6 +57,20 @@ namespace Foody.Data.Data
                     };
                 }).ToList().ForEach(x => context.Subcribers.Add(x));
             }
+
+            if (!context.Inquiries.Any())
+                Enumerable.Range(0, 3).Select(_ => 
+                {
+                    var name = _ % 2 == 0 ?  Faker.Name.FullName() : Faker.Name.First();
+                    return new Contact
+                    {
+                        Name = name,
+                        Email = Faker.Internet.Email(name),
+                        Subject = Faker.Lorem.Sentence(5),
+                        Message = string.Join(Environment.NewLine ,Faker.Lorem.Sentences(10)),
+                        Tel = _ is 1 ? Faker.Phone.Number() : default
+                    };
+                }).ToList().ForEach(x => context.Inquiries.Add(x));
 
             context.SaveChanges();
         }
