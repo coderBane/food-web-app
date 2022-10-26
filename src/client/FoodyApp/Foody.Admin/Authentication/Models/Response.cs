@@ -11,4 +11,3 @@ public class AccountResponse
     public IEnumerable<string> Errors { get; set; }
 }
 
-
