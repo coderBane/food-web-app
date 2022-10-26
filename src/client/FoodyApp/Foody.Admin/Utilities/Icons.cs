@@ -3,6 +3,7 @@
 public static class Icons
 {
     public const string Server = "dns.png";
+    public const string Inbox = "inbox.png";
     public const string Clock = "clock.png";
     public const string Badge = "badge.png";
     public const string Items = "menu_book.png";

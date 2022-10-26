@@ -7,7 +7,7 @@ namespace Foody.Admin.Rest.Services;
 
 public class HttpsClientHandlerService : IHttpsClientHandlerService
 {
-    public HttpsClientHandlerService(out HttpClient client)
+    public void Initialize(out HttpClient client)
     {
         var handler = GetPlatformHandler();
         client = handler is not null ? new(handler) : null;

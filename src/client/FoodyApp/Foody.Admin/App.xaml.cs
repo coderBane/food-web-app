@@ -1,10 +1,12 @@
-﻿using Foody.Admin.Authentication.Interfaces;
+﻿using Foody.Admin.Authentication.Models;
+using Foody.Admin.Authentication.Interfaces;
 
 
 namespace Foody.Admin;
 
 public partial class App : Application
 {
+	public static string Token { get; set; }
 	public static IAccountRepository Account { get; private set; }
 
 	public App(IAccountRepository account)

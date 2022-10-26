@@ -5,5 +5,7 @@ namespace Foody.Admin.Manager;
 public interface IDataManager
 {
     CategoryService Category { get; }
+
+    IInquiryService Inquiries { get; }
 }
 

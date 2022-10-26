@@ -1,6 +1,6 @@
 ﻿using Foody.Admin.Authentication.Models;
 using Foody.Admin.Authentication.Interfaces;
-using System.Net.Http.Headers;
+
 
 namespace Foody.Admin.Authentication.Services;
 
@@ -23,20 +23,18 @@ public class AccountService : IAccountRepository
 
     public async Task<(bool, AccountResponse, string)> Authenticate(Login login)
     {
-        //var data = JsonSerializer.Serialize(login, _serializerOptions);
-        var json = JsonContent.Create(login, mediaType: MediaTypeHeaderValue.Parse("application/json"), options: _serializerOptions);
-        //var content = new StringContent(data, Encoding.UTF8, "application/json");
+        var data = JsonSerializer.Serialize(login, _serializerOptions);
+        var content = new StringContent(data, Encoding.UTF8, "application/json");
 
         string message;
 
         try
         {
-            var result = await _client.PostAsync(Address.Account.LoginAddress, json);
-            result.EnsureSuccessStatusCode();
+            var result = await _client.PostAsync(Address.Account.LoginAddress, content);
             response = await result.Content.ReadFromJsonAsync<AccountResponse>();
 
             if (!response.Success)
-                Debug.WriteLine(response.Errors.ToString());
+                Debug.WriteLine(string.Join(". ",response.Errors));
 
             return (response.Success, response, null);
         }

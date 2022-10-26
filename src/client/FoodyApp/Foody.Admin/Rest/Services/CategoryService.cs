@@ -2,18 +2,20 @@
 
 public class CategoryService : RestService<Category>
 {
-    public CategoryService()
+    public CategoryService(IHttpsClientHandlerService httpsClientHandler) : base(httpsClientHandler)
     {
-        this.url = Address.Category.BaseAddress;
+        url = Address.Category.BaseAddress;
     }
 
-    public override async Task<Result<dynamic>> SaveDataAsync(Category entity, bool isNew = false)
+    public override async Task<Result<dynamic>> SaveDataAsync(Category entity, bool isNew)
     {
         try
         {
-            var content = new MultipartFormDataContent();
-            content.Add(new StringContent(entity.Name), nameof(entity.Name));
-            content.Add(new StringContent($"{entity.IsActive}"), nameof(entity.IsActive));
+            var content = new MultipartFormDataContent
+            {
+                { new StringContent(entity.Name), nameof(entity.Name) },
+                { new StringContent($"{entity.IsActive}"), nameof(entity.IsActive) }
+            };
 
             if (entity.ImageUpload is not null)
                 content.Add(entity.ImageUpload, "file", nameof(entity.ImageUpload));

@@ -1,5 +1,4 @@
 ﻿using Foody.Admin.Pages;
-using Foody.Admin.ViewModels;
 
 namespace Foody.Admin;
 

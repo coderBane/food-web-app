@@ -20,5 +20,12 @@ public static class Address
     {
         public const string BaseAddress = "/v1/Category";
     }
+
+    public static class Inquiry
+    {
+        public const string BaseAddress = "/v1/Contact";
+        public const string List = BaseAddress + "/Inquiries";
+        public const string Reply = BaseAddress + "/Reply/";
+    }
 }
 
