@@ -1,16 +1,18 @@
 ﻿using Foody.Admin.Authentication.Models;
 using Image = Microsoft.Maui.Controls.Image;
 
+
 namespace Foody.Admin.Pages;
 
 public class LoginPage : ContentPage
 {
-    Entry uEntry, pEntry;
+    private readonly Entry username;
+    private readonly Entry password;
 
-	public LoginPage()
+    public LoginPage()
 	{
-        uEntry = new Entry() { Placeholder = "email or username" };
-        pEntry = new Entry() { Placeholder = "password", IsPassword = true };
+        username = new Entry() { Placeholder = "email or username" };
+        password = new Entry() { Placeholder = "password", IsPassword = true };
 
         Content = new VerticalStackLayout
         {
@@ -65,7 +67,7 @@ public class LoginPage : ContentPage
                             Text = "Username",
                             FontSize = 15
                         },
-                        uEntry
+                        username
                     }
                 },
                 new VerticalStackLayout
@@ -79,35 +81,51 @@ public class LoginPage : ContentPage
                             Text = "Password",
                             FontSize = 15
                         },
-                        pEntry
+                        password
                     }
                 },
                 new Button
                 {
                     Text = "LOG IN",
-                    Command = new Command(async () => await Shell.Current.GoToAsync($"//{nameof(DashboardPage)}"))
+                    Command = new Command(async () => await Submit())
                 }
             }
         };
-
-        //Shell.SetNavBarIsVisible(Content, false);
     }
 
-    async void Submit()
+    async Task Submit()
     {
-        var response = await App.Account.Authenticate(new Login
+        if (!string.IsNullOrWhiteSpace(username.Text) && !string.IsNullOrWhiteSpace(password.Text))
         {
-            Username = uEntry.Text,
-            Password = pEntry.Text
-        });
+            var (success, response, message) = await App.Account.Authenticate(new Login
+            {
+                Email = username.Text,
+                Password = password.Text
+            });
 
-        if (!response.Item1)
-            if (response.Item2 is not null)
-                await DisplayAlert("Authentication Failed", $"{response.Item2.Errors.ToString()}", "Try Again");
-            else
-                await DisplayAlert("Authentication Failed", $"{response.Item3}","Try Again");
-        else
-            await DisplayAlert("Success", "", "Ok");
+            if (!success)
+            {
+                if (response is not null)
+                    await DisplayAlert(Constants.authFail, $"{string.Join(Environment.NewLine, response.Errors)}", Constants.tryAgain);
+                else
+                    await DisplayAlert(Constants.authFail, $"{message}", Constants.tryAgain);
+
+                return;
+            }
+
+            try
+            {
+                await SecureStorage.Default.SetAsync(Constants.jwt, response.Token);
+                await SecureStorage.Default.SetAsync(Constants.refresh, response.RefreshToken);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                App.Token = response.Token;
+            }
+
+            await Shell.Current.GoToAsync($"//{nameof(DashboardPage)}");
+        }
     }
 }
 
