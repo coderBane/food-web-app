@@ -18,5 +18,5 @@ public abstract class BaseEntity : IEntity
     public DateTime AddedOn { get; set; } = DateTime.UtcNow;
 
     [ScaffoldColumn(false)]
-    public DateTime Updated { get; set; } 
+    public DateTime Updated { get; set; }  = default(DateTime);
 }
