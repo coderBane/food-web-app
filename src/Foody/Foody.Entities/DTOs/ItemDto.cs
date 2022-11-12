@@ -9,7 +9,7 @@ public class Image
 {
     public int Id { get; set; }
 
-    public decimal FileSize { get; set; }
+    public long Size { get; set; }
 
     public byte[] Content { get; set; }
 }

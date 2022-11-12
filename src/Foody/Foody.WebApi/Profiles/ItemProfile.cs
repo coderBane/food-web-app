@@ -13,8 +13,7 @@ namespace Foody.WebApi.Profiles
             CreateMap<Category, CategoryDto>();
 
             CreateMap<Category, CategoryDetailDto>();
-            CreateMap<AppFile, Image>()
-                .ForMember(dto => dto.FileSize, opt => opt.MapFrom(src => src.Size));
+            CreateMap<ProductImage, Image>();
 
             CreateMap<CategoryModDto, Category>(MemberList.Source);
 

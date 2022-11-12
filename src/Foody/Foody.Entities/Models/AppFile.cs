@@ -1,8 +1,8 @@
 ﻿namespace Foody.Entities.Models
 {
-    public sealed class AppFile : BaseEntity
+    public abstract class ImageFile : BaseEntity
     {
-        [MaxLength(1048576, ErrorMessage = "Max upload size is 1MB.")]
+        [MaxLength(2097152, ErrorMessage = "Max upload size is 2MB.")]
         public byte[] Content { get; set; } = null!;
 
         public string UntrustedName { get; set; } = null!;
@@ -13,7 +13,13 @@
         [FileExtensions(Extensions = "png,jpg,jpeg,svg")]
         public string FileExtension { get; set; } = null!;
 
-        public decimal Size { get; set; }
+        public long Size { get; set; }
+    }
+
+    public sealed class ProductImage : ImageFile
+    {
+        public int ItemId {get; set; }
+
+        public Item? Item { get; set; }
     }
 }
-

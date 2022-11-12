@@ -2,8 +2,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-using Foody.Entities.Models;
-
 namespace Foody.Data.Data
 {
     public class FoodyDbContext : IdentityDbContext
@@ -14,6 +12,7 @@ namespace Foody.Data.Data
         public DbSet<Item> Items => Set<Item>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Category> Categories => Set<Category>();
+        public DbSet<ImageFile> Images => Set<ImageFile>();
         public DbSet<Contact> Inquiries => Set<Contact>();
         public DbSet<Newsletter> Subcribers => Set<Newsletter>();
         public virtual DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
@@ -40,6 +39,12 @@ namespace Foody.Data.Data
 
                 b.HasComment("Table which implements table-per-heirachy inheritance (TPH)" + "\n" +
                     "Contains data for both Categories and Product.");
+            });
+
+            modelBuilder.Entity<ImageFile>(b => 
+            {
+                b.HasDiscriminator();
+                b.HasComment("Table holding all images in database.");
             });
 
             modelBuilder.Entity<Newsletter>()
