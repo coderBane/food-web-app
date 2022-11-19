@@ -15,5 +15,9 @@ public sealed class Product : Item
     public string? Description { get; set; }
 
     public Category Category { get; set; } = null!;
+
+    public ICollection<OrderDetail> OrderDetail { get; set; }
+
+    public Product() => OrderDetail = new List<OrderDetail>();
 }
 
