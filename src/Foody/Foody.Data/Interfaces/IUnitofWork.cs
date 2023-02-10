@@ -6,6 +6,8 @@ public interface IUnitofWork
 
     IProductRepository Products { get; }
 
+    IOrderRepository Orders { get; }
+
     IRefreshTokenRepository RefreshToken { get; }
 
     INewsletterRepository Subcribers { get; }
