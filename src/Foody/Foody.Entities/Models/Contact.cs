@@ -1,30 +1,32 @@
 ﻿namespace Foody.Entities.Models;
 
-public sealed record Contact : IEntity
+public sealed class Contact : IEntity
 {
     [Key]
     public int Id { get; init; }
 
+    public bool Read { get; set; }
+
     [Required]
     [MaxLength(50)]
-    public string Name { get; init; } = null!;
+    public string Name { get; set; } = null!;
 
     [Phone]
-    public string? Tel { get; init; }
+    public string? Tel { get; set; }
 
     [Required]
     [EmailAddress]
     [DataType(DataType.EmailAddress)]
-    public string Email { get; init; } = null!;
+    public string Email { get; set; } = null!;
 
     [Required]
     [StringLength(100, MinimumLength = 10)]
-    public string Subject { get; init; } = null!;
+    public string Subject { get; set; } = null!;
 
     [DataType(DataType.MultilineText)]
-    public string? Message { get; init; }
+    public string? Message { get; set; }
 
     [ScaffoldColumn(false)]
-    public DateTime Date { get; init; } = DateTime.UtcNow; 
+    public DateTime Date { get; set; } = DateTime.UtcNow; 
 }
 

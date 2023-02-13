@@ -19,6 +19,8 @@ namespace Foody.WebApi.Controllers.v1
     {
         private readonly ICacheService _cacheService;
 
+        internal string sKey = string.Empty;
+
         protected string _cached = string.Empty;
 
         protected IUnitofWork _unitofWork;
