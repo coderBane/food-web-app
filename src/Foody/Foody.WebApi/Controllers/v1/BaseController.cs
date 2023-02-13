@@ -19,6 +19,8 @@ namespace Foody.WebApi.Controllers.v1
     {
         private readonly ICacheService _cacheService;
 
+        internal string sKey = string.Empty;
+
         protected string _cached = string.Empty;
 
         protected IUnitofWork _unitofWork;
@@ -89,7 +91,7 @@ namespace Foody.WebApi.Controllers.v1
                 using var ms = new MemoryStream();
                 await file.CopyToAsync(ms);
 
-                entity.Image = new AppFile
+                entity.Image = new()
                 {
                     Content = ms.ToArray(),
                     UntrustedName = file.FileName,

@@ -14,6 +14,7 @@ public sealed class UnitofWork : IUnitofWork, IDisposable
         _context = context ?? throw new ArgumentNullException(nameof(context));
         Categories = new CategoryRepository(_context);
         Products = new ProductRepository(_context);
+        Orders = new OrderRepository(_context);
         RefreshToken = new RefreshTokenRepository(_context);
         Subcribers = new NewsletterRepository(_context);
         Contacts = new ContactRepository(_context);
@@ -22,6 +23,8 @@ public sealed class UnitofWork : IUnitofWork, IDisposable
     public ICategoryRepository Categories { get; private set; }
 
     public IProductRepository Products { get; private set; }
+
+    public IOrderRepository Orders { get; private set; }
 
     public IRefreshTokenRepository RefreshToken { get; private set; }
 

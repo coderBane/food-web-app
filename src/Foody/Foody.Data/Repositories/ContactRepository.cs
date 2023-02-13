@@ -9,7 +9,6 @@ namespace Foody.Data.Repositories
     {
         public ContactRepository(FoodyDbContext context) : base(context) { }
 
-
         public override async Task<IEnumerable<Contact>> All([Optional] string? search)
         {
             return string.IsNullOrEmpty(search) ? await base.All(search) :
@@ -21,6 +20,17 @@ namespace Foody.Data.Repositories
         public override Task<Contact?> Get(int id)
         {
             return _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<bool> ToggleRead(int id)
+        {
+            var inquiry = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (inquiry is null)
+                return false;
+
+            inquiry.Read = !inquiry.Read;
+            return true;
         }
     }
 }

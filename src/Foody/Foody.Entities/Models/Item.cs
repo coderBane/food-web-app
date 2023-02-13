@@ -7,18 +7,19 @@ public abstract class Item : BaseEntity
     [StringLength(50, MinimumLength = 4)]
     public string Name { get; set; } = null!;
 
+    [Column(Order = 2)]
     [Display(Name = "Status")]
-    public  bool IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     [ScaffoldColumn(false)]
     public string ImageUri { get; set; }
 
     [ScaffoldColumn(false)]
-    public AppFile Image { get; set; }
+    public ProductImage Image { get; set; }
 
     public Item()
     {
-        Image = new AppFile
+        Image = new()
         {
             Content = File.ReadAllBytes("wwwroot/images/noImg.jpeg"),
             UntrustedName = "noImg.jpeg",
@@ -30,8 +31,5 @@ public abstract class Item : BaseEntity
 
         ImageUri = (Guid.NewGuid() + "-" + Image.UntrustedName).Replace(" ", "");
     }
-
-    //[MaxLength(2097152, ErrorMessage = "Max upload size is 2MB.")]
-    //public byte[] ImageData { get; set; } = Array.Empty<byte>();
 }
 

@@ -88,7 +88,7 @@ namespace Foody.WebApi.Controllers.v1
 
             await _unitofWork.Categories.Add(category);
             await _unitofWork.CompleteAsync();
-            await SetCache($"{category.Id}", category, _cached);
+            //await SetCache($"{category.Id}", category, _cached);
 
             var _dto = _mapper.Map<CategoryDto>(category);
             result.Content = _dto;
@@ -133,7 +133,7 @@ namespace Foody.WebApi.Controllers.v1
 
                 await _unitofWork.Categories.Update(category);
                 await _unitofWork.CompleteAsync();
-                await SetCache($"{category.Id}", category, _cached);
+                //await SetCache($"{category.Id}", category, _cached);
             }
             catch (DbUpdateConcurrencyException) when (!_unitofWork.Categories.Exists(id))
             {

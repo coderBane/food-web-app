@@ -1,6 +1,5 @@
-﻿using AutoMapper;
+﻿using Foody.Data.Services;
 using Foody.Data.Interfaces;
-using Foody.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -11,6 +10,7 @@ namespace Foody.WebApi.Controllers.v1
         public ContactController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
             : base(unitofWork, mapper, cacheService)
         {
+            sKey = "inq-";
             _cached = "inquiries";
         }
 
@@ -38,7 +38,7 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(200, Type = typeof(Result<Contact>))]
         public async Task<IActionResult> Get(int id)
         {
-            string key = $"{id}";
+            string key =  $"{sKey}{id}";
             var result = new Result<Contact>();
 
             var cacheData = await GetCache<Contact>(key);
@@ -78,28 +78,48 @@ namespace Foody.WebApi.Controllers.v1
 
             await _unitofWork.Contacts.Add(message);
             await _unitofWork.CompleteAsync();
-            await SetCache($"{message.Id}", message, _cached);
+            await SetCache($"{sKey}{message.Id}", message, _cached);
 
             result.Content = "Message Sent!";
 
             return Ok(result);
         }
 
-        [HttpPost("Reply/{email}")]
-        public async Task<IActionResult> Post(string email)
+        [HttpPost("Read/{id}")]
+        [ProducesResponseType(204, Type = typeof(Result<object>))]
+        public async Task<IActionResult> ToggleRead(int id)
         {
-            // var mail = new EmailDto
-            // {
-            //     Subject = "Newsletter Subriction",
-            //     From = "foody.support@example.com",
-            //     To = email,
-            //     Body = await System.IO.File.ReadAllTextAsync("wwwroot/html/signup.html"),
-            // };
+            var result = new Result<object>();
+            bool marked = await _unitofWork.Contacts.ToggleRead(id);
 
-            // await _emailService.SendMail(mail);
+            if (!marked)
+            {
+                result.Error = AddError(404, ErrorsMessage.Generic.NotFound,
+                                            ErrorsMessage.Generic.NullSet);
+                    
+                return NotFound(result);
+            }
+            await _unitofWork.CompleteAsync();
+            await DeleteCache($"{sKey}{id}");
 
-            return Ok();
+            return NoContent();
         }
+
+        // [HttpPost("Reply/{email}")]
+        // public async Task<IActionResult> Post(string email)
+        // {
+        //     // var mail = new EmailDto
+        //     // {
+        //     //     Subject = "Newsletter Subriction",
+        //     //     From = "foody.support@example.com",
+        //     //     To = email,
+        //     //     Body = await System.IO.File.ReadAllTextAsync("wwwroot/html/signup.html"),
+        //     // };
+
+        //     // await _emailService.SendMail(mail);
+
+        //     return Ok();
+        // }
     }
 }
 
