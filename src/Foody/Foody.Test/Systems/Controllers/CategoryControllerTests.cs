@@ -16,8 +16,10 @@ namespace Foody.Test.Systems.Controllers
             var fakeData = A.Dummy<CategoryModDto>();
             fakeData.Name = name;
 
-            var controller = new CategoryController(unitofWork, mapper, cacheService);
-            controller.ObjectValidator = new ObjectValidator();
+            var controller = new CategoryController(unitofWork, mapper, cacheService)
+            {
+                ObjectValidator = new ObjectValidator()
+            };
 
             //Act
             var actionResult = await controller.Post(fakeData);
@@ -39,8 +41,10 @@ namespace Foody.Test.Systems.Controllers
             //var fakeEntity = mapper.Map<Category>(fakeDto);
             //A.CallTo(() => unitofWork.Categories.Add(fakeEntity)).Returns(Task.CompletedTask);
 
-            var controller = new CategoryController(unitofWork, mapper, cacheService);
-            controller.ObjectValidator = new ObjectValidator();
+            var controller = new CategoryController(unitofWork, mapper, cacheService)
+            {
+                ObjectValidator = new ObjectValidator()
+            };
 
             //Act
             var actionResult = await controller.Post(fakeDto);
@@ -56,8 +60,10 @@ namespace Foody.Test.Systems.Controllers
             //Arrange
             var fakeData = A.Dummy<CategoryModDto>();
             fakeData.Name = "T"; // name less than 4 characters
-            var controller = new CategoryController(unitofWork, mapper, cacheService);
-            controller.ObjectValidator = new ObjectValidator();
+            var controller = new CategoryController(unitofWork, mapper, cacheService)
+            {
+                ObjectValidator = new ObjectValidator()
+            };
 
             //Act
             var actionResult = await controller.Post(fakeData);
@@ -78,9 +84,11 @@ namespace Foody.Test.Systems.Controllers
 
             A.CallTo(() => unitofWork.Categories.Exists(fakeData.Name)).Returns(Task.FromResult(true));
 
-            var controller = new CategoryController(unitofWork, mapper, cacheService);
-            controller.ObjectValidator = new ObjectValidator();
-            
+            var controller = new CategoryController(unitofWork, mapper, cacheService)
+            {
+                ObjectValidator = new ObjectValidator()
+            };
+
             //Act
             var actionResult = await controller.Post(fakeData);
 
@@ -102,11 +110,13 @@ namespace Foody.Test.Systems.Controllers
             fakeDto.IsActive = true;
 
             var fakeEntity = ItemFixtures.GetCategory();
-            A.CallTo(() => unitofWork.Categories.Get(fakeEntity.Id)).Returns(Task.FromResult(fakeEntity));
+            A.CallTo(() => unitofWork.Categories.Get(fakeEntity.Id)).Returns(Task.FromResult<Category?>(fakeEntity));
             A.CallTo(() => unitofWork.Categories.Update(fakeEntity)).Returns(Task.CompletedTask);
 
-            var controller = new CategoryController(unitofWork, mapper, cacheService);
-            controller.ObjectValidator = new ObjectValidator();
+            var controller = new CategoryController(unitofWork, mapper, cacheService)
+            {
+                ObjectValidator = new ObjectValidator()
+            };
 
             //Act
             var actionResult = await controller.Put(fakeEntity.Id, fakeDto);
@@ -146,10 +156,12 @@ namespace Foody.Test.Systems.Controllers
             fakeDto.ImageUpload = ItemFixtures.InvalidFileType();
 
             var fakeEntity = ItemFixtures.GetCategory();
-            A.CallTo(() => unitofWork.Categories.Get(fakeEntity.Id)).Returns(Task.FromResult(fakeEntity));
+            A.CallTo(() => unitofWork.Categories.Get(fakeEntity.Id)).Returns(Task.FromResult<Category?>(fakeEntity));
 
-            var controller = new CategoryController(unitofWork, mapper, cacheService);
-            controller.ObjectValidator = new ObjectValidator();
+            var controller = new CategoryController(unitofWork, mapper, cacheService)
+            {
+                ObjectValidator = new ObjectValidator()
+            };
 
             //Act
             var actionResult = await controller.Put(fakeEntity.Id, fakeDto);
@@ -170,8 +182,10 @@ namespace Foody.Test.Systems.Controllers
             A.CallTo(() => unitofWork.Categories.Exists(default(int))).Returns(false);
             A.CallTo(() => unitofWork.CompleteAsync()).ThrowsAsync(() => new DbUpdateConcurrencyException());
 
-            var controller = new CategoryController(unitofWork, mapper, cacheService);
-            controller.ObjectValidator = new ObjectValidator();
+            var controller = new CategoryController(unitofWork, mapper, cacheService)
+            {
+                ObjectValidator = new ObjectValidator()
+            };
 
             //Act
             var actionResult = await controller.Put(default, fakeDto);

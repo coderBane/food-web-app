@@ -8,7 +8,7 @@ namespace Foody.Test.Systems.Controllers
     public class ContactControllerTests : TestBase
     {
         static readonly int id = 0;
-        readonly string key = $"{id}";
+        // readonly string key = $"{id}";
         readonly string search = string.Empty;
 
         [Fact]
@@ -21,7 +21,7 @@ namespace Foody.Test.Systems.Controllers
             var actionResult = await controller.Get(string.Empty);
 
             //Assert
-            var result = Assert.IsType<OkObjectResult>(actionResult);
+            Assert.IsType<OkObjectResult>(actionResult);
         }
 
         [Fact]

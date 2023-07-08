@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Foody.Utilities.Responses;
+﻿namespace Foody.Utilities.Responses;
 
 public sealed class Error
 {

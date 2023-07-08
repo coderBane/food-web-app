@@ -9,9 +9,9 @@ namespace Foody.Test.Helpers
         {
             var results = new List<ValidationResult>();
 
-            var context = new ValidationContext(model, null, null);
+            var context = new ValidationContext(model!, null, null);
 
-            bool isValid = Validator.TryValidateObject(model, context, results, true);
+            bool isValid = Validator.TryValidateObject(model!, context, results, true);
 
             if (!isValid)
             {
