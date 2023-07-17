@@ -1,6 +1,4 @@
-﻿using Foody.WebApi.Extensions.Services;
-
-namespace Foody.WebApi.Extensions;
+﻿namespace Foody.WebApi.Extensions.Services.Base;
 
 public static class ServiceExtensions
 {

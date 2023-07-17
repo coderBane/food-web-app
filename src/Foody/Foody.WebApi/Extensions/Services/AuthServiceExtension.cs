@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using Foody.Auth.Configuration;
+using Foody.WebApi.Extensions.Services.Base;
+
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 

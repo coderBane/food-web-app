@@ -1,6 +1,7 @@
 ﻿using Foody.WebApi.Filters;
+using Foody.WebApi.Extensions.Services.Base;
+
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 
 namespace Foody.WebApi.Extensions.Services;
 

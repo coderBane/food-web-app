@@ -1,5 +1,5 @@
 ﻿using Foody.Data.Data;
-using Foody.WebApi.Extensions;
+using Foody.WebApi.Extensions.Services.Base;
 
 var builder = WebApplication.CreateBuilder(args);
 

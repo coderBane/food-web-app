@@ -1,6 +1,8 @@
 ﻿using Foody.Data.Data;
 using Foody.Data.Services;
 using Foody.Data.Interfaces;
+using Foody.WebApi.Extensions.Services.Base;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;

@@ -1,4 +1,4 @@
-﻿namespace Foody.WebApi.Extensions.Services;
+﻿namespace Foody.WebApi.Extensions.Services.Base;
 
 public interface IServiceExtension
 {
