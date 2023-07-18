@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Foody.Data.Constants;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -10,10 +11,13 @@ namespace Foody.Data.Data
         {
             using var context = serviceProvider.GetRequiredService<FoodyDbContext>();
 
-            var userId = await NewUser(serviceProvider, pw);
-            await NewRole(serviceProvider, userId);
+            if (await context.Database.CanConnectAsync())
+            {
+                var userId = await NewUser(serviceProvider, pw);
+                await NewRole(serviceProvider, userId);
 
-            SeedData(context);
+                SeedData(context);
+            }
         }
 
         public static void SeedData(FoodyDbContext context)
@@ -82,17 +86,18 @@ namespace Foody.Data.Data
             if (userManager is null)
                 throw new NullReferenceException($"{nameof(userManager)} is null");
 
-            var user = await userManager.FindByNameAsync("admin");
+            var user = await userManager.FindByNameAsync(UserConstants.Administrator.username);
 
             if (user is null)
             {
-                user = new IdentityUser("admin")
+                user = new IdentityUser(UserConstants.Administrator.username)
                 {
-                    Email = "admin@foody.com",
+                    Email = UserConstants.Administrator.email,
                     EmailConfirmed = true
                 };
-                await userManager.CreateAsync(user, pass);
-            }   
+                var res = await userManager.CreateAsync(user, pass);
+                if (!res.Succeeded) throw new Exception("Failed to initialise admin user");
+            }
 
             return user.Id;
         }
@@ -114,10 +119,7 @@ namespace Foody.Data.Data
             if (userManager is null)
                 throw new NullReferenceException($"{nameof(userManager)} is null");
 
-            var user = await userManager.FindByIdAsync(uid);
-
-            if (user is null)
-                throw new NullReferenceException("User not found!");
+            var user = await userManager.FindByIdAsync(uid) ?? throw new NullReferenceException("User not found!");
 
             if (!await userManager.IsInRoleAsync(user, "Admin") ) 
                 await userManager.AddToRoleAsync(user, "Admin");
