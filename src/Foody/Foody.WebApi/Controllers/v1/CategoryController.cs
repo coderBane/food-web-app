@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Foody.Data.Services;
-using Foody.Data.Interfaces;
+﻿using Foody.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +7,10 @@ namespace Foody.WebApi.Controllers.v1
 {
     public sealed class CategoryController : BaseController
     {
-        public CategoryController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
+        public CategoryController(IUnitOfWork unitofWork, IMapper mapper, ICacheService cacheService)
             : base(unitofWork, mapper, cacheService)
         {
-            this._cached = "categories";
+            _cached = "categories";
         }
 
         // GET: v1/Categories
@@ -25,28 +23,28 @@ namespace Foody.WebApi.Controllers.v1
 
             if (cacheData is null)
             {
-                var categories = await _unitofWork.Categories.All();
-                var _dto = _mapper.Map<List<CategoryDto>>(categories);
-                cacheData = _dto;
-                await SetCache(_cached, cacheData);
+                var categories = await _unitofWork.Categories.AllAsync();
+                cacheData = _mapper.Map<List<CategoryDto>>(categories) ?? Enumerable.Empty<CategoryDto>();
+                if (cacheData.Any())
+                    await SetCache(_cached, cacheData);
             }
 
-            return _unitofWork.Categories is not null ? Ok(new Pagination<CategoryDto>(cacheData)) :
-                Problem(ErrorsMessage.Generic.NullSet, statusCode: 500, type: "Server Error");
+            return Ok(new Pagination<CategoryDto>(cacheData));
         }
 
         // GET: v1/Category/5
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(Result<CategoryDetailDto>))]
+        [ProducesResponseType(404, Type = typeof(Result<CategoryDetailDto>))]
         public async Task<IActionResult> Get(int id)
         {
-            string key = $"{id}";
+            string key = $"{_cached}-{id}";
             var result = new Result<CategoryDetailDto>();
 
             var cacheData = await GetCache<CategoryDetailDto>(key);
             if (cacheData is null)
             {
-                var category = await _unitofWork.Categories.Get(id);
+                var category = await _unitofWork.Categories.GetAsync(id);
                 if (category is null)
                 {
                     result.Error = AddError(404,
@@ -71,7 +69,7 @@ namespace Foody.WebApi.Controllers.v1
         {
             var result = new Result<CategoryDto>();
 
-            if (await _unitofWork.Categories.Exists(categoryModDto.Name))
+            if (await _unitofWork.Categories.ExistsAsync(categoryModDto.Name))
             {
                 result.Error = AddError(409,
                    ErrorsMessage.Generic.ValidationError,
@@ -86,8 +84,9 @@ namespace Foody.WebApi.Controllers.v1
             var invalid = ValidateModel(category, categoryModDto, result);
             if (invalid is not null) return invalid;
 
-            await _unitofWork.Categories.Add(category);
-            await _unitofWork.CompleteAsync();
+            await _unitofWork.Categories.AddAsync(category);
+            await _unitofWork.CommitAsync();
+            await DeleteCache(_cached);
             //await SetCache($"{category.Id}", category, _cached);
 
             var _dto = _mapper.Map<CategoryDto>(category);
@@ -103,7 +102,7 @@ namespace Foody.WebApi.Controllers.v1
         {
             var result = new Result<dynamic>();
 
-            var category = await _unitofWork.Categories.Get(id);
+            var category = await _unitofWork.Categories.GetAsync(id);
             if (category is null || category.Id != id)
             {
                 result.Error = AddError(404,
@@ -113,7 +112,7 @@ namespace Foody.WebApi.Controllers.v1
                 return NotFound(result);
             }
 
-            if (await _unitofWork.Categories.Exists(categoryModDto.Name)
+            if (await _unitofWork.Categories.ExistsAsync(categoryModDto.Name)
                 && (category.Name != categoryModDto.Name))
             {
                 result.Error = AddError(409,
@@ -131,8 +130,8 @@ namespace Foody.WebApi.Controllers.v1
                 var invalid = ValidateModel(category, categoryModDto, result);
                 if (invalid is not null) return invalid;
 
-                await _unitofWork.Categories.Update(category);
-                await _unitofWork.CompleteAsync();
+                await _unitofWork.Categories.UpdateAsync(category);
+                await _unitofWork.CommitAsync();
                 //await SetCache($"{category.Id}", category, _cached);
             }
             catch (DbUpdateConcurrencyException) when (!_unitofWork.Categories.Exists(id))
@@ -152,22 +151,20 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(204)]
         public async Task<IActionResult> Delete(int id)
         {
-            try
+            bool deleted = await _unitofWork.Categories.DeleteAsync(id);
+            if (!deleted)
             {
-                await _unitofWork.Categories.Delete(id);
-                await _unitofWork.CompleteAsync();
-                await DeleteCache($"{id}");
-                await DeleteCache(_cached);
-            }
-            catch (NullReferenceException)
-            {
-                Result<dynamic> result = new();
-                result.Error = AddError(404,
+                return NotFound(new Result<object>
+                {
+                    Error = AddError(404,
                     ErrorsMessage.Generic.NotFound,
-                    ErrorsMessage.Category.NotExist);
-
-                return NotFound(result);
+                    ErrorsMessage.Category.NotExist)
+                });
             }
+
+            await _unitofWork.CommitAsync();
+            await DeleteCache($"{_cached}-{id}");
+            await DeleteCache(_cached);
 
             return NoContent();
         }

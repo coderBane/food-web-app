@@ -1,9 +1,7 @@
 ﻿using Foody.Data.Data;
 using Foody.Data.Services;
-using Foody.Data.Interfaces;
 using Foody.WebApi.Extensions.Services.Base;
 
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
@@ -16,18 +14,14 @@ public class DataServiceExtension : IServiceExtension
     {
         // Add DbContext DI
         services.AddDbContext<FoodyDbContext>(options =>
-            options.UseNpgsql(configuration.GetValue<string>("Postgres"))
+            options.UseNpgsql(configuration.GetConnectionString("Postgres"))
                .UseSnakeCaseNamingConvention());
 
-        // Add Identity DI
-        services.AddIdentity<IdentityUser, IdentityRole>(options =>
-            options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<FoodyDbContext>();
-
         // Add UnitofWork DI
-        services.AddScoped<IUnitofWork, UnitofWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer
-            .Connect(configuration.GetValue<string>("Redis")));
+            .Connect(configuration.GetConnectionString("Redis")));
 
         // Add Caching DI
         services.AddSingleton<ICacheService, CacheService>();

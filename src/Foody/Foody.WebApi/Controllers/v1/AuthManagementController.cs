@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Foody.Data.Services;
-using Foody.Data.Interfaces;
+﻿using Foody.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +10,7 @@ namespace Foody.WebApi.Controllers.v1
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public sealed class AuthManagementController : AuthBaseController
     {
-        public AuthManagementController(IUnitofWork unitofWork, IMapper mapper, ICacheService  cacheService,
+        public AuthManagementController(IUnitOfWork unitofWork, IMapper mapper, ICacheService  cacheService,
             UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
             : base(unitofWork, mapper, cacheService, userManager, roleManager) { }
 

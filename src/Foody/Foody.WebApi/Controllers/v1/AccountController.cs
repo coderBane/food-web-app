@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-
-using Foody.Auth.DTOs;
-using Foody.Data.Interfaces;
+﻿using Foody.Auth.DTOs;
 using Foody.Auth.Configuration;
 
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +19,7 @@ namespace Foody.WebApi.Controllers.v1
 
         private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public AccountController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService,
+        public AccountController(IUnitOfWork unitofWork, IMapper mapper, ICacheService cacheService,
             UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
             IOptionsMonitor<JwtConfig> optionsMonitor, TokenValidationParameters tokenValidationParameters)
             : base(unitofWork, mapper, cacheService, userManager, roleManager)
@@ -230,11 +227,11 @@ namespace Foody.WebApi.Controllers.v1
                     };
 
                 // start processing
-                bool updated = await _unitofWork.RefreshToken.Update(storedToken);
+                bool updated = await _unitofWork.RefreshToken.UpdateAsync(storedToken);
 
                 if (!updated) return null;
        
-                await _unitofWork.CompleteAsync();
+                await _unitofWork.CommitAsync();
 
                 // regenerate token
                 var dbUser = await _userManager.FindByIdAsync(storedToken.UserId);
@@ -295,8 +292,8 @@ namespace Foody.WebApi.Controllers.v1
                 ExipryDate = DateTime.UtcNow.AddMonths(6),
             };
 
-            await _unitofWork.RefreshToken.Add(refreshToken);
-            await _unitofWork.CompleteAsync();
+            await _unitofWork.RefreshToken.AddAsync(refreshToken);
+            await _unitofWork.CommitAsync();
 
             //var tokenData = new TokenData
             //{

@@ -1,15 +1,12 @@
 ﻿using Foody.Data.Data;
-using Foody.Data.Interfaces;
-
 
 namespace Foody.Data.Repositories
 {
     public sealed class RefreshTokenRepository : Repository<RefreshToken>, IRefreshTokenRepository
     {
-        public RefreshTokenRepository(FoodyDbContext context) : base(context) { }
-
+        public RefreshTokenRepository(FoodyDbContext context, ILogger logger) : base(context, logger) { }
          
-        public async Task<bool> Update(RefreshToken storedToken)
+        public async Task<bool> UpdateAsync(RefreshToken storedToken)
         {
             try
             {

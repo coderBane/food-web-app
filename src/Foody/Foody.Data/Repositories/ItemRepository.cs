@@ -1,20 +1,20 @@
-﻿using Foody.Data.Data;
-using Foody.Data.Interfaces;
+﻿using System.Runtime.InteropServices;
+using Foody.Data.Data;
 
 namespace Foody.Data.Repositories
 {
     public abstract class ItemRepository<T> : Repository<T>, IItemRepository<T>
         where T : Item
     {
-        public ItemRepository(FoodyDbContext context) : base(context) { }
+        public ItemRepository(FoodyDbContext context, ILogger logger) : base(context, logger) { }
 
         public bool Exists(int id) => (_dbSet?.Any(i => i.Id == id)).GetValueOrDefault();
 
-        public async Task<bool> Exists(string name) => await _dbSet.AnyAsync(i => i.Name == name);
+        public async Task<bool> ExistsAsync(string name) => await _dbSet.AnyAsync(i => i.Name == name);
 
-        public virtual async Task Update(T entity)
+        public virtual Task UpdateAsync(T entity)
         {
-            var existing = await base.Get(entity.Id);
+            var existing = _dbSet.Find(entity.Id);
 
             if (existing is not null)
             {
@@ -28,7 +28,10 @@ namespace Foody.Data.Repositories
                 }
 
                 existing.Updated = DateTime.UtcNow;
+                _logger.LogDebug("Flagged Item for update {id}", existing.Id);
             }
+
+            return Task.CompletedTask;
         }
     }
 }

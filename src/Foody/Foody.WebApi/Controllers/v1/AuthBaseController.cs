@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Foody.Data.Interfaces;
-using Foody.Data.Services;
+﻿using Foody.Data.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +12,7 @@ namespace Foody.WebApi.Controllers.v1
 
         protected readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthBaseController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService,
+        public AuthBaseController(IUnitOfWork unitofWork, IMapper mapper, ICacheService cacheService,
             UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
             : base(unitofWork, mapper, cacheService)
         {

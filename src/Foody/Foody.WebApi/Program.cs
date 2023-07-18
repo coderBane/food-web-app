@@ -17,7 +17,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    var password = builder.Configuration.GetValue<string>("UserPW");
+    var password = builder.Configuration.GetValue<string>("AdminPW");
     await DbInitialize.InitializeAsync(services, password);
 }
 /****************************/

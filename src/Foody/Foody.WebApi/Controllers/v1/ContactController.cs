@@ -1,5 +1,4 @@
 ﻿using Foody.Data.Services;
-using Foody.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -7,10 +6,9 @@ namespace Foody.WebApi.Controllers.v1
 {
     public sealed class ContactController : BaseController
     {
-        public ContactController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
+        public ContactController(IUnitOfWork unitofWork, IMapper mapper, ICacheService cacheService)
             : base(unitofWork, mapper, cacheService)
         {
-            sKey = "inq-";
             _cached = "inquiries";
         }
 
@@ -25,7 +23,7 @@ namespace Foody.WebApi.Controllers.v1
             var cacheData = cacheEnable ? await GetCache<IEnumerable<Contact>>(_cached) : null;
             if (cacheData is null)
             {
-                cacheData = await _unitofWork.Contacts.All(search);
+                cacheData = await _unitofWork.Inquiries.AllAsync(search!);
                 if (cacheEnable)
                     await SetCache(_cached, cacheData);
             }
@@ -38,13 +36,13 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(200, Type = typeof(Result<Contact>))]
         public async Task<IActionResult> Get(int id)
         {
-            string key =  $"{sKey}{id}";
+            string key =  $"{_cached}-{id}";
             var result = new Result<Contact>();
 
             var cacheData = await GetCache<Contact>(key);
             if (cacheData is null)
             {
-                var message = await _unitofWork.Contacts.Get(id);
+                var message = await _unitofWork.Inquiries.GetAsync(id);
 
                 if (message is null)
                 {
@@ -76,9 +74,9 @@ namespace Foody.WebApi.Controllers.v1
             var invalid = ValidateModel(message, dto, result);
             if (invalid is not null) return invalid;
 
-            await _unitofWork.Contacts.Add(message);
-            await _unitofWork.CompleteAsync();
-            await SetCache($"{sKey}{message.Id}", message, _cached);
+            await _unitofWork.Inquiries.AddAsync(message);
+            await _unitofWork.CommitAsync();
+            await SetCache($"{_cached}-{message.Id}", message, _cached);
 
             result.Content = "Message Sent!";
 
@@ -90,7 +88,7 @@ namespace Foody.WebApi.Controllers.v1
         public async Task<IActionResult> ToggleRead(int id)
         {
             var result = new Result<object>();
-            bool marked = await _unitofWork.Contacts.ToggleRead(id);
+            bool marked = await _unitofWork.Inquiries.ToggleRead(id);
 
             if (!marked)
             {
@@ -99,7 +97,7 @@ namespace Foody.WebApi.Controllers.v1
                     
                 return NotFound(result);
             }
-            await _unitofWork.CompleteAsync();
+            await _unitofWork.CommitAsync();
             await DeleteCache($"{sKey}{id}");
 
             return NoContent();

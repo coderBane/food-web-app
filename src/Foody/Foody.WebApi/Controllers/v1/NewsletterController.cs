@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Foody.Data.Interfaces;
-using Foody.Data.Services;
+﻿using Foody.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -8,7 +6,7 @@ namespace Foody.WebApi.Controllers.v1
 {
     public sealed class NewsletterController : BaseController
     {
-        public NewsletterController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
+        public NewsletterController(IUnitOfWork unitofWork, IMapper mapper, ICacheService cacheService)
             : base(unitofWork, mapper, cacheService)
         {
             _cached = "subcribers";
@@ -24,7 +22,7 @@ namespace Foody.WebApi.Controllers.v1
             var cachedData = await GetCache<IEnumerable<Newsletter>>(_cached);
             if (cachedData is null)
             {
-                cachedData = await _unitofWork.Subcribers.All();
+                cachedData = await _unitofWork.Subcribers.AllAsync();
                 await SetCache(_cached, cachedData);
             }
             
@@ -44,12 +42,12 @@ namespace Foody.WebApi.Controllers.v1
             var invalid = ValidateModel(subcriber, dto, result);
             if (invalid is not null) return invalid;
 
-            if (_unitofWork.Subcribers.Duplicate(subcriber.Email))
+            if (_unitofWork.Subcribers.Exists(subcriber.Email))
                 return NoContent();
 
-            await _unitofWork.Subcribers.Add(subcriber);
-            await _unitofWork.CompleteAsync();
-            await SetCache($"{subcriber.Id}", subcriber, _cached);
+            await _unitofWork.Subcribers.AddAsync(subcriber);
+            await _unitofWork.CommitAsync();
+            await SetCache($"{_cached}-{subcriber.Id}", subcriber, _cached);
             
             result.Content = "Added to mailing list!";
             return Ok(result);
@@ -75,8 +73,8 @@ namespace Foody.WebApi.Controllers.v1
                 return NotFound(result);
             }
            
-            await _unitofWork.Subcribers.Delete(subcriber.Value);
-            await _unitofWork.CompleteAsync();
+            await _unitofWork.Subcribers.DeleteAsync(subcriber.Value);
+            await _unitofWork.CommitAsync();
             await DeleteCache(_cached);
 
             return NoContent();

@@ -1,7 +1,0 @@
-﻿namespace Foody.Data.Interfaces;
-
-public interface IRefreshTokenRepository : IRepository<RefreshToken>
-{
-    Task<bool> Update(RefreshToken storedToken);
-}
-

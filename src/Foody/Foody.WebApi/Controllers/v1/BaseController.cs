@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Foody.Data.Services;
-using Foody.Data.Interfaces;
+﻿using Foody.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Foody.WebApi.Filters;
@@ -23,27 +21,22 @@ namespace Foody.WebApi.Controllers.v1
 
         protected string _cached = string.Empty;
 
-        protected IUnitofWork _unitofWork;
+        protected IUnitOfWork _unitofWork;
 
         public readonly IMapper _mapper;
 
-        public BaseController(IUnitofWork unitofWork, IMapper mapper, ICacheService cacheService)
+        public BaseController(IUnitOfWork unitofWork, IMapper mapper, ICacheService cacheService)
         {
             _cacheService = cacheService;
             _unitofWork = unitofWork;
             _mapper = mapper;
         }
 
-        internal async Task<T?> GetCache<T>(string key)
-        {
-            var cacheData = await _cacheService.GetData<T>(key);
-            return cacheData is null ? default :
-                cacheData is IEnumerable<object> en ? (en.Any() ? cacheData : default) : cacheData;
-        }
+        internal async Task<T?> GetCache<T>(string key) => await _cacheService.GetData<T>(key);
 
         internal async Task SetCache<T>(string key, T data, string? collectionKey = default)
         {
-            var expiryTime = DateTimeOffset.Now.AddMinutes(5);
+            var expiryTime = DateTimeOffset.Now.AddMinutes(10);
             await _cacheService.SetData(key, data, expiryTime);
 
             if (!string.IsNullOrEmpty(collectionKey))

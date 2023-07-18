@@ -1,5 +1,4 @@
 ﻿using Foody.Data.Data;
-using Foody.Data.Interfaces;
 using System.Runtime.InteropServices;
 
 
@@ -7,8 +6,7 @@ namespace Foody.Data.Repositories;
 
 public sealed class ProductRepository : ItemRepository<Product>, IProductRepository
 {
-    public ProductRepository(FoodyDbContext context) : base(context) { }
-
+    public ProductRepository(FoodyDbContext context, ILogger logger) : base(context, logger) { }
 
     public async Task<IReadOnlyDictionary<string, List<ProdCategoryDto>>?> ProducstByCategory()
     {
@@ -40,8 +38,7 @@ public sealed class ProductRepository : ItemRepository<Product>, IProductReposit
         return null;
     }
 
-
-    public override async Task<IEnumerable<Product>> All([Optional] string? search)
+    public override async Task<IEnumerable<Product>> AllAsync([Optional] string search)
     {
         try
         {
@@ -49,7 +46,7 @@ public sealed class ProductRepository : ItemRepository<Product>, IProductReposit
                                  .Include(p => p.Category)
                                  .AsQueryable();
 
-            if (!string.IsNullOrEmpty(search))
+            if (!string.IsNullOrWhiteSpace(search))
             {
                 string filter = search.ToLower();
                 products = products.Where(p => p.Name.ToLower().Contains(filter)
@@ -66,8 +63,7 @@ public sealed class ProductRepository : ItemRepository<Product>, IProductReposit
         return Enumerable.Empty<Product>();
     }
 
-
-    public override async Task<Product?> Get(int id)
+    public override async Task<Product?> GetAsync(int id)
     {
         try
         {
@@ -85,10 +81,9 @@ public sealed class ProductRepository : ItemRepository<Product>, IProductReposit
         return null;
     }
 
-
-    public override async Task Update(Product product)
+    public override Task UpdateAsync(Product product)
     {
-        var existing = await base.Get(product.Id);
+        var existing = _dbSet.Find(product.Id);
 
         if (existing is not null)
         {
@@ -107,6 +102,8 @@ public sealed class ProductRepository : ItemRepository<Product>, IProductReposit
 
             existing.Updated = DateTime.UtcNow;
         }
+
+        return Task.CompletedTask;
     }
 }
 
