@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Foody.Data.Services;
-using Foody.Data.Interfaces;
+using Foody.Entities.Repositories;
 using Foody.WebApi.Profiles;
 
 
@@ -9,7 +9,7 @@ namespace Foody.Test
     public class TestBase
     {
         internal readonly IMapper mapper;
-        internal readonly IUnitofWork unitofWork = A.Fake<IUnitofWork>();
+        internal readonly IUnitOfWork unitofWork = A.Fake<IUnitOfWork>();
         internal readonly ICacheService cacheService = A.Fake<ICacheService>();
 
         public TestBase()

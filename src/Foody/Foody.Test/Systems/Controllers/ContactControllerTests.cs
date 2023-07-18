@@ -29,14 +29,14 @@ namespace Foody.Test.Systems.Controllers
         {
             //Arrange
             var fakeData = A.CollectionOfDummy<Contact>(5).AsEnumerable();
-            A.CallTo(() => unitofWork.Contacts.All(search)).Returns(Task.FromResult(fakeData));
+            A.CallTo(() => unitofWork.Inquiries.AllAsync(search)).Returns(Task.FromResult(fakeData));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
             //Act
             var actionResult = await controller.Get(search);
 
             //Assert
-            A.CallTo(() => unitofWork.Contacts.All(search)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => unitofWork.Inquiries.AllAsync(search)).MustHaveHappenedOnceExactly();
             Assert.IsType<OkObjectResult>(actionResult);
         }
 
@@ -47,7 +47,7 @@ namespace Foody.Test.Systems.Controllers
         {
             //Arrange
             var fakeData = A.CollectionOfDummy<Contact>(count).AsEnumerable();
-            A.CallTo(() => unitofWork.Contacts.All(search)).Returns(Task.FromResult(fakeData));
+            A.CallTo(() => unitofWork.Inquiries.AllAsync(search)).Returns(Task.FromResult(fakeData));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
             //Act
@@ -80,7 +80,7 @@ namespace Foody.Test.Systems.Controllers
             //Arrange
             var fakeData = A.CollectionOfDummy<Contact>(3).AsEnumerable();
             A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
-            A.CallTo(() => unitofWork.Contacts.Get(id))
+            A.CallTo(() => unitofWork.Inquiries.GetAsync(id))
                 .Returns(Task.FromResult(fakeData.FirstOrDefault(fk => fk.Id == id)));
 
             var controller = new ContactController(unitofWork, mapper, cacheService);
@@ -89,7 +89,7 @@ namespace Foody.Test.Systems.Controllers
             var actionResult = await controller.Get(id);
 
             //Assert
-            A.CallTo(() => unitofWork.Contacts.Get(id)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => unitofWork.Inquiries.GetAsync(id)).MustHaveHappenedOnceExactly();
             Assert.IsType<OkObjectResult>(actionResult);
         }
 
@@ -102,7 +102,7 @@ namespace Foody.Test.Systems.Controllers
             //Arrange
             var fakeData = InquiriesFixtures.GetContacts().FirstOrDefault(c => c.Id == id);
             A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
-            A.CallTo(() => unitofWork.Contacts.Get(id))
+            A.CallTo(() => unitofWork.Inquiries.GetAsync(id))
                 .Returns(Task.FromResult(fakeData));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
@@ -123,7 +123,7 @@ namespace Foody.Test.Systems.Controllers
             //Arrange
             int id = 300;
             A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
-            A.CallTo(() => unitofWork.Contacts.Get(id)).Returns(Task.FromResult((Contact?)null));
+            A.CallTo(() => unitofWork.Inquiries.GetAsync(id)).Returns(Task.FromResult((Contact?)null));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
             //Act
@@ -138,7 +138,7 @@ namespace Foody.Test.Systems.Controllers
         }
 
         //[Fact]
-        //public async Task Get_Inquiry_ReturnServerErrorr()
+        //public async Task Get_Inquiry_ReturnServerError()
         //{
         //    //Arrange
         //    A.CallTo(() => cacheService.GetData<Contact>(key)).Returns(Task.FromResult((Contact?)null));

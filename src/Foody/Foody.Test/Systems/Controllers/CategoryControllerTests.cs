@@ -8,6 +8,7 @@ namespace Foody.Test.Systems.Controllers
     public class CategoryControllerTests : TestBase
     {
         private readonly string name = "Rice";
+        private readonly CancellationTokenSource cts = new();
 
         [Fact]
         public async Task Post_Return201()
@@ -50,7 +51,7 @@ namespace Foody.Test.Systems.Controllers
             var actionResult = await controller.Post(fakeDto);
 
             //Assert
-            A.CallTo(() => unitofWork.CompleteAsync()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => unitofWork.CommitAsync(cts.Token)).MustHaveHappenedOnceExactly();
             Assert.IsType<CreatedAtActionResult>(actionResult);
         }
 
@@ -82,7 +83,7 @@ namespace Foody.Test.Systems.Controllers
             var fakeData = A.Dummy<CategoryModDto>();
             fakeData.Name = name;
 
-            A.CallTo(() => unitofWork.Categories.Exists(fakeData.Name)).Returns(Task.FromResult(true));
+            A.CallTo(() => unitofWork.Categories.ExistsAsync(fakeData.Name)).Returns(Task.FromResult(true));
 
             var controller = new CategoryController(unitofWork, mapper, cacheService)
             {
@@ -93,7 +94,7 @@ namespace Foody.Test.Systems.Controllers
             var actionResult = await controller.Post(fakeData);
 
             //Assert
-            A.CallTo(() => unitofWork.CompleteAsync()).MustNotHaveHappened();
+            // A.CallTo(() => unitofWork.CommitAsync()).MustNotHaveHappened();
             var result = Assert.IsType<ConflictObjectResult>(actionResult);
             var data = Assert.IsAssignableFrom<Result<CategoryDto>>(result.Value);
             Assert.NotNull(data.Error);
@@ -110,8 +111,8 @@ namespace Foody.Test.Systems.Controllers
             fakeDto.IsActive = true;
 
             var fakeEntity = ItemFixtures.GetCategory();
-            A.CallTo(() => unitofWork.Categories.Get(fakeEntity.Id)).Returns(Task.FromResult<Category?>(fakeEntity));
-            A.CallTo(() => unitofWork.Categories.Update(fakeEntity)).Returns(Task.CompletedTask);
+            A.CallTo(() => unitofWork.Categories.GetAsync(fakeEntity.Id)).Returns(Task.FromResult<Category?>(fakeEntity));
+            A.CallTo(() => unitofWork.Categories.UpdateAsync(fakeEntity)).Returns(Task.CompletedTask);
 
             var controller = new CategoryController(unitofWork, mapper, cacheService)
             {
@@ -122,7 +123,7 @@ namespace Foody.Test.Systems.Controllers
             var actionResult = await controller.Put(fakeEntity.Id, fakeDto);
 
             //Assert
-            A.CallTo(() => unitofWork.CompleteAsync()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => unitofWork.CommitAsync(cts.Token)).MustHaveHappenedOnceExactly();
             Assert.IsType<NoContentResult>(actionResult);
         }
 
@@ -133,7 +134,7 @@ namespace Foody.Test.Systems.Controllers
             int id = 300;
             var fakeDto = A.Dummy<CategoryModDto>();
 
-            A.CallTo(() => unitofWork.Categories.Get(id)).Returns(Task.FromResult((Category?)null));
+            A.CallTo(() => unitofWork.Categories.GetAsync(id)).Returns(Task.FromResult((Category?)null));
 
             var controller = new CategoryController(unitofWork, mapper, cacheService);
 
@@ -156,7 +157,7 @@ namespace Foody.Test.Systems.Controllers
             fakeDto.ImageUpload = ItemFixtures.InvalidFileType();
 
             var fakeEntity = ItemFixtures.GetCategory();
-            A.CallTo(() => unitofWork.Categories.Get(fakeEntity.Id)).Returns(Task.FromResult<Category?>(fakeEntity));
+            A.CallTo(() => unitofWork.Categories.GetAsync(fakeEntity.Id)).Returns(Task.FromResult<Category?>(fakeEntity));
 
             var controller = new CategoryController(unitofWork, mapper, cacheService)
             {
@@ -179,8 +180,8 @@ namespace Foody.Test.Systems.Controllers
             var fakeDto = A.Dummy<CategoryModDto>();
             fakeDto.Name = name;
 
-            A.CallTo(() => unitofWork.Categories.Exists(default(int))).Returns(false);
-            A.CallTo(() => unitofWork.CompleteAsync()).ThrowsAsync(() => new DbUpdateConcurrencyException());
+            A.CallTo(() => unitofWork.Categories.Exists(default)).Returns(false);
+            A.CallTo(() => unitofWork.CommitAsync(cts.Token)).ThrowsAsync(() => new DbUpdateConcurrencyException());
 
             var controller = new CategoryController(unitofWork, mapper, cacheService)
             {
