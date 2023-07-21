@@ -18,17 +18,18 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(200, Type = typeof(Pagination<Contact>))]
         public async Task<IActionResult> Get(string? search)
         {
-            bool cacheEnable = string.IsNullOrEmpty(search);
+            bool cacheEnable = string.IsNullOrWhiteSpace(search);
 
-            var cacheData = cacheEnable ? await GetCache<IEnumerable<Contact>>(_cached) : null;
-            if (cacheData is null)
+            var data = cacheEnable ? await GetCache<IEnumerable<Contact>>(_cached) : default;
+
+            if (data is null)
             {
-                cacheData = await _unitofWork.Inquiries.AllAsync(search!);
-                if (cacheEnable)
-                    await SetCache(_cached, cacheData);
+                data = await _unitofWork.Inquiries.AllAsync(search!);
+                if (cacheEnable && data.Any())
+                    await SetCache(_cached, data);
             }
 
-            return Ok(new Pagination<Contact>(cacheData));
+            return Ok(new Pagination<Contact>(data));
         }
 
         // GET api/values/5
@@ -84,7 +85,8 @@ namespace Foody.WebApi.Controllers.v1
         }
 
         [HttpPost("Read/{id}")]
-        [ProducesResponseType(204, Type = typeof(Result<object>))]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404, Type = typeof(Result<object>))]
         public async Task<IActionResult> ToggleRead(int id)
         {
             var result = new Result<object>();
@@ -98,7 +100,7 @@ namespace Foody.WebApi.Controllers.v1
                 return NotFound(result);
             }
             await _unitofWork.CommitAsync();
-            await DeleteCache($"{sKey}{id}");
+            await DeleteCache($"{_cached}-{id}");
 
             return NoContent();
         }

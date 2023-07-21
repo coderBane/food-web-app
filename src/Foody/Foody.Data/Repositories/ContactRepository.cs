@@ -13,7 +13,7 @@ public sealed class ContactRepository : Repository<Contact>, IContactRepository
         return string.IsNullOrWhiteSpace(search) ? await base.AllAsync() :
             await _dbSet.Where(c => c.Name.ToLower().Contains(search.ToLower()))
                         .AsNoTracking()
-                        .ToListAsync();
+                        .ToListAsync() ?? Enumerable.Empty<Contact>();
     }
 
     public async Task<bool> ToggleRead(int id)

@@ -3,13 +3,13 @@
     public static class InquiriesFixtures
     {
         public static List<Contact> GetContacts() =>
-            Enumerable.Range(211, 218).Select(_ =>
+            Enumerable.Range(211, 10).Select(i =>
             {
                 var name = Faker.Name.FullName();
 
                 return new Contact
                 {
-                    Id = _,
+                    Id = i,
                     Name = name,
                     Email = Faker.Internet.Email(name),
                     Subject = Faker.Lorem.Sentence(10),

@@ -1,14 +1,10 @@
-﻿using Foody.Test.Helpers;
-using Foody.Test.Fixtures;
-using Microsoft.AspNetCore.Mvc;
-
+﻿using Foody.Test.Fixtures;
 
 namespace Foody.Test.Systems.Controllers
 {
     public class ContactControllerTests : TestBase
     {
-        static readonly int id = 0;
-        // readonly string key = $"{id}";
+        const string cache = "inquiries";
         readonly string search = string.Empty;
 
         [Fact]
@@ -28,8 +24,8 @@ namespace Foody.Test.Systems.Controllers
         public async void Get_All_InvokeUnitOfWork_ReturnOk()
         {
             //Arrange
-            var fakeData = A.CollectionOfDummy<Contact>(5).AsEnumerable();
-            A.CallTo(() => unitofWork.Inquiries.AllAsync(search)).Returns(Task.FromResult(fakeData));
+            A.CallTo(() => cacheService.GetData<IEnumerable<Contact>>(cache))
+                .Returns(Task.FromResult<IEnumerable<Contact>?>(null));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
             //Act
@@ -40,14 +36,12 @@ namespace Foody.Test.Systems.Controllers
             Assert.IsType<OkObjectResult>(actionResult);
         }
 
-        [Theory]
-        [InlineData(4)]
-        [InlineData(10)]
-        public async void Get_ListOfInquiries_ReturnOk(int count)
+        [Fact]
+        public async void Get_All_FromCache_ReturnOk()
         {
             //Arrange
-            var fakeData = A.CollectionOfDummy<Contact>(count).AsEnumerable();
-            A.CallTo(() => unitofWork.Inquiries.AllAsync(search)).Returns(Task.FromResult(fakeData));
+            var fakeData = A.CollectionOfDummy<Contact>(5).AsEnumerable();
+            A.CallTo(() => cacheService.GetData<IEnumerable<Contact>>(cache)).Returns(Task.FromResult(fakeData));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
             //Act
@@ -58,7 +52,26 @@ namespace Foody.Test.Systems.Controllers
             var data = Assert.IsAssignableFrom<Pagination<Contact>>(result.Value);
             Assert.True(data.Success);
             Assert.NotNull(data.Content);
-            Assert.Equal(count, data.Content.Count());
+            Assert.Equal(5, data.Content.Count());
+        }
+
+        [Fact]
+        public async void Get_All_FromDb_ReturnOK()
+        {
+            // Arrange
+            var fakeData = A.CollectionOfDummy<Contact>(5).AsEnumerable();
+            A.CallTo(() => cacheService.GetData<IEnumerable<Contact>>(cache))
+                .Returns(Task.FromResult<IEnumerable<Contact>?>(null));
+            A.CallTo(() => unitofWork.Inquiries.AllAsync(search)).Returns(Task.FromResult(fakeData));
+            var controller = new ContactController(unitofWork, mapper, cacheService);
+
+            // Act
+            var actionResult = await controller.Get(default(string));
+
+            // Assert
+            var result = Assert.IsType<OkObjectResult>(actionResult);
+            var data = Assert.IsAssignableFrom<Pagination<Contact>>(result.Value);
+            Assert.Equal(5, data.ResultItems);
         }
 
         [Fact]
@@ -78,10 +91,8 @@ namespace Foody.Test.Systems.Controllers
         public async void Get_Single_InvokeUnitOfWork_ReturnOk()
         {
             //Arrange
-            var fakeData = A.CollectionOfDummy<Contact>(3).AsEnumerable();
-            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
-            A.CallTo(() => unitofWork.Inquiries.GetAsync(id))
-                .Returns(Task.FromResult(fakeData.FirstOrDefault(fk => fk.Id == id)));
+            const int id = 2;
+            A.CallTo(() => cacheService.GetData<Contact>($"{cache}-{id}")).Returns(Task.FromResult<Contact?>(null));
 
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
@@ -97,13 +108,13 @@ namespace Foody.Test.Systems.Controllers
         [InlineData(213)]
         [InlineData(215)]
         [InlineData(217)]
-        public async void Get_Inquiry_ReturnOk(int id)
+        public async void Get_Single_FromDb_ReturnOk(int id)
         {
             //Arrange
-            var fakeData = InquiriesFixtures.GetContacts().FirstOrDefault(c => c.Id == id);
-            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
+            var fakeData = InquiriesFixtures.GetContacts();
+            A.CallTo(() => cacheService.GetData<Contact>($"{cache}-{id}")).Returns(Task.FromResult((Contact?)null));
             A.CallTo(() => unitofWork.Inquiries.GetAsync(id))
-                .Returns(Task.FromResult(fakeData));
+                .Returns(Task.FromResult(fakeData.FirstOrDefault(x => x.Id == id)));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
             //Act
@@ -118,12 +129,14 @@ namespace Foody.Test.Systems.Controllers
         }
 
         [Fact]
-        public async Task Get_Inquiry_ReturnNotFound()
+        public async Task Get_Single_ReturnNotFound()
         {
             //Arrange
-            int id = 300;
-            A.CallTo(() => cacheService.GetData<Contact>($"{id}")).Returns(Task.FromResult((Contact?)null));
-            A.CallTo(() => unitofWork.Inquiries.GetAsync(id)).Returns(Task.FromResult((Contact?)null));
+            const int id = 300;
+            var fakeData = InquiriesFixtures.GetContacts();
+            A.CallTo(() => cacheService.GetData<Contact>($"{cache}-{id}")).Returns(Task.FromResult((Contact?)null));
+            A.CallTo(() => unitofWork.Inquiries.GetAsync(id))
+                .Returns(Task.FromResult<Contact?>(null));
             var controller = new ContactController(unitofWork, mapper, cacheService);
 
             //Act
@@ -135,6 +148,34 @@ namespace Foody.Test.Systems.Controllers
             Assert.False(data.Success);
             Assert.NotNull(data.Error);
             Assert.Null(data.Content);
+        }
+
+        [Fact]
+        public async Task ToggleRead_Return_NoContent()
+        {
+            //Arrange
+            A.CallTo(() => unitofWork.Inquiries.ToggleRead(2)).Returns(Task.FromResult(true));
+            var controller = new ContactController(unitofWork, mapper, cacheService);
+
+            //Act
+            var actionResult = await controller.ToggleRead(2);
+
+            //Assert
+            Assert.IsType<NoContentResult>(actionResult);
+        }
+
+        [Fact]
+        public async Task ToggleRead_Return_NotFound()
+        {
+            //Arrange
+            A.CallTo(() => unitofWork.Inquiries.ToggleRead(2)).Returns(Task.FromResult(false));
+            var controller = new ContactController(unitofWork, mapper, cacheService);
+
+            //Act
+            var actionResult = await controller.ToggleRead(2);
+
+            //Assert
+            Assert.IsType<NotFoundObjectResult>(actionResult);
         }
 
         //[Fact]
