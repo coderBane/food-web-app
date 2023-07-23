@@ -61,7 +61,7 @@ namespace Foody.WebApi.Controllers.v1
         [ProducesResponseType(200, Type = typeof(Result<ProductDetailDto>))]
         public async Task<IActionResult> Get(int id)
         {
-            string key = $"{id}";
+            string key = $"{_cached}-{id}";
             var result = new Result<ProductDetailDto>();
 
             var cacheData = await GetCache<ProductDetailDto>(key);
@@ -136,7 +136,9 @@ namespace Foody.WebApi.Controllers.v1
                 return NotFound(result);
             }
 
-            if (await _unitofWork.Categories.ExistsAsync(productModDto.Name) && productModDto.Name != product.Name)
+            if ((await _unitofWork.Categories.ExistsAsync(productModDto.Name) 
+                || await _unitofWork.Products.ExistsAsync(productModDto.Name)) 
+                && productModDto.Name != product.Name)
             {
                 result.Error = AddError(409,
                    ErrorsMessage.Generic.ValidationError,
