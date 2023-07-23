@@ -23,7 +23,8 @@ namespace Foody.WebApi.Controllers.v1
             if (cachedData is null)
             {
                 cachedData = await _unitofWork.Subcribers.AllAsync();
-                await SetCache(_cached, cachedData);
+                if (cachedData.Any())
+                    await SetCache(_cached, cachedData);
             }
             
             return Ok(new Pagination<Newsletter>(cachedData));
@@ -59,10 +60,9 @@ namespace Foody.WebApi.Controllers.v1
         public async Task<IActionResult> Delete(string email)
         {
             var result = new Result<dynamic>();
-            var subcriber = _unitofWork.Subcribers
-                .Find(s => s.Email == email)
-                .AsParallel()
-                .FirstOrDefault()?.Id;
+            var subcriber = _unitofWork.Subcribers.Find(s => s.Email.ToLower() == email.ToLower())
+                                                  .AsParallel()
+                                                  .FirstOrDefault();
 
             if (subcriber is null)
             {
@@ -72,8 +72,8 @@ namespace Foody.WebApi.Controllers.v1
 
                 return NotFound(result);
             }
-           
-            await _unitofWork.Subcribers.DeleteAsync(subcriber.Value);
+
+            await _unitofWork.Subcribers.DeleteAsync(subcriber.Id);
             await _unitofWork.CommitAsync();
             await DeleteCache(_cached);
 
